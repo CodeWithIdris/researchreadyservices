@@ -42,11 +42,11 @@ const CTASection = () => {
               <span>contact@researchready.com</span>
             </a>
             <a
-              href="tel:+1-800-123-4567"
+              href="tel:+2349022282963"
               className="flex items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors"
             >
               <Phone className="h-5 w-5" />
-              <span>+1 (800) 123-4567</span>
+              <span>+234 902 228 2963</span>
             </a>
           </div>
         </div>
