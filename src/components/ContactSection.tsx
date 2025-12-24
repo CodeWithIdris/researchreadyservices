@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Mail, MessageSquare, User } from "lucide-react";
+import { Send, Mail, MessageSquare, User, Phone } from "lucide-react";
 import { z } from "zod";
 
 const contactSchema = z.object({
@@ -110,7 +110,18 @@ const ContactSection = () => {
               </div>
               <div className="flex items-center gap-4 p-4 bg-card rounded-lg border border-border">
                 <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center">
-                  <MessageSquare className="w-6 h-6 text-accent-foreground" />
+                  <Phone className="w-6 h-6 text-accent-foreground" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Call Us</p>
+                  <a href="tel:+2349022282963" className="text-muted-foreground hover:text-accent transition-colors">
+                    +234 902 228 2963
+                  </a>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 p-4 bg-card rounded-lg border border-border">
+                <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center">
+                  <MessageSquare className="w-6 h-6 text-secondary-foreground" />
                 </div>
                 <div>
                   <p className="font-medium text-foreground">Quick Response</p>
