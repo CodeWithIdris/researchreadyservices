@@ -49,12 +49,16 @@ const HeroSection = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 opacity-0 animate-fade-in" style={{ animationDelay: "0.5s" }}>
-              <Button variant="gold" size="xl" className="group">
-                Start Your Project
-                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <Button variant="gold" size="xl" className="group" asChild>
+                <a href="https://wa.me/2349022282963?text=Hello%2C%20I%27m%20interested%20in%20starting%20a%20research%20project" target="_blank" rel="noopener noreferrer">
+                  Start Your Project
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </a>
               </Button>
-              <Button variant="heroOutline" size="xl">
-                View Our Services
+              <Button variant="heroOutline" size="xl" asChild>
+                <a href="#services">
+                  View Our Services
+                </a>
               </Button>
             </div>
 

@@ -23,23 +23,27 @@ const CTASection = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-            <Button variant="gold" size="xl" className="group">
-              Get Free Consultation
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            <Button variant="gold" size="xl" className="group" asChild>
+              <a href="https://wa.me/2349022282963?text=Hello%2C%20I%27d%20like%20a%20free%20consultation%20for%20my%20research%20project" target="_blank" rel="noopener noreferrer">
+                Get Free Consultation
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </a>
             </Button>
-            <Button variant="heroOutline" size="xl">
-              View Pricing
+            <Button variant="heroOutline" size="xl" asChild>
+              <a href="#services">
+                View Pricing
+              </a>
             </Button>
           </div>
 
           {/* Contact Info */}
           <div className="flex flex-col sm:flex-row justify-center gap-8 pt-8 border-t border-border">
             <a
-              href="mailto:contact@researchready.com"
+              href="mailto:researchreadyservices@gmail.com"
               className="flex items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors"
             >
               <Mail className="h-5 w-5" />
-              <span>contact@researchready.com</span>
+              <span>researchreadyservices@gmail.com</span>
             </a>
             <a
               href="tel:+2349022282963"
