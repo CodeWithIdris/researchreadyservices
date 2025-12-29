@@ -2,21 +2,39 @@ import { Star, Quote } from "lucide-react";
 
 const testimonials = [
   {
-    name: "Dr. Sarah Mitchell",
-    role: "PhD Candidate, Stanford University",
+    name: "Dr. Adaobi Nwankwo",
+    role: "PhD Candidate, University of Lagos",
     content: "ResearchReady transformed my dissertation journey. Their expert guidance and meticulous attention to detail helped me achieve distinction. Highly recommended for any serious researcher.",
     rating: 5,
   },
   {
-    name: "Prof. James Chen",
-    role: "Associate Professor, MIT",
+    name: "Prof. Chukwuemeka Okonkwo",
+    role: "Associate Professor, University of Nigeria",
     content: "The literature review they provided was comprehensive and insightful. It saved me weeks of work and gave me a solid foundation for my research paper.",
     rating: 5,
   },
   {
-    name: "Emily Rodriguez",
-    role: "Master's Student, Columbia University",
+    name: "Amina Bello",
+    role: "Master's Student, Ahmadu Bello University",
     content: "Outstanding service! They understood exactly what I needed and delivered beyond my expectations. The turnaround time was impressive without compromising quality.",
+    rating: 5,
+  },
+  {
+    name: "Oluwaseun Adeyemi",
+    role: "PhD Researcher, University of Ibadan",
+    content: "Professional, reliable, and incredibly thorough. They helped me navigate the complexities of my thesis with ease. I couldn't have done it without their support.",
+    rating: 5,
+  },
+  {
+    name: "Dr. Ngozi Eze",
+    role: "Lecturer, Covenant University",
+    content: "Their research analysis was exceptional. The statistical interpretation and methodology guidance were exactly what I needed for my publication.",
+    rating: 5,
+  },
+  {
+    name: "Kwame Asante",
+    role: "Graduate Student, University of Ghana",
+    content: "From proposal to final submission, ResearchReady was there every step of the way. Their expertise in academic writing is unmatched in the region.",
     rating: 5,
   },
 ];

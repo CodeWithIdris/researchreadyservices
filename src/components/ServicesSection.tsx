@@ -34,6 +34,13 @@ const services = [
 ];
 
 const ServicesSection = () => {
+  const phoneNumber = "2349022282963";
+
+  const handleServiceClick = (serviceTitle: string) => {
+    const message = encodeURIComponent(`Hello, I need support with ${serviceTitle}. Please provide more information about this service.`);
+    window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
+  };
+
   return (
     <section id="services" className="py-20 lg:py-32 bg-secondary/30">
       <div className="container mx-auto px-4 lg:px-8">
@@ -53,9 +60,10 @@ const ServicesSection = () => {
         {/* Services Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {services.map((service, index) => (
-            <div
+            <button
               key={service.title}
-              className="group bg-card rounded-xl p-6 lg:p-8 shadow-sm border border-border hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in"
+              onClick={() => handleServiceClick(service.title)}
+              className="group bg-card rounded-xl p-6 lg:p-8 shadow-sm border border-border hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in text-left cursor-pointer"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-accent/20 transition-colors">
@@ -67,7 +75,10 @@ const ServicesSection = () => {
               <p className="text-muted-foreground leading-relaxed">
                 {service.description}
               </p>
-            </div>
+              <span className="inline-block mt-4 text-accent font-semibold text-sm group-hover:underline">
+                Get Support →
+              </span>
+            </button>
           ))}
         </div>
       </div>
