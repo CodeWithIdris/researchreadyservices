@@ -2,25 +2,32 @@ import { Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const phoneNumber = "2349022282963";
+
+  const getServiceWhatsAppLink = (serviceName: string) => {
+    const message = encodeURIComponent(`Hello, I need support with ${serviceName}. Please provide more information.`);
+    return `https://wa.me/${phoneNumber}?text=${message}`;
+  };
 
   const links = {
     services: [
-      { name: "Dissertation Writing", href: "#" },
-      { name: "Literature Reviews", href: "#" },
-      { name: "Thesis Editing", href: "#" },
-      { name: "Research Analysis", href: "#" },
+      { name: "Dissertation Writing", href: getServiceWhatsAppLink("Dissertation Writing"), external: true },
+      { name: "Literature Reviews", href: getServiceWhatsAppLink("Literature Reviews"), external: true },
+      { name: "Thesis Editing", href: getServiceWhatsAppLink("Thesis Editing"), external: true },
+      { name: "Research Analysis", href: getServiceWhatsAppLink("Research Analysis"), external: true },
     ],
     company: [
-      { name: "About Us", href: "#" },
-      { name: "Our Writers", href: "#" },
-      { name: "Pricing", href: "#" },
-      { name: "Contact", href: "#contact" },
+      { name: "About Us", href: "#", external: false },
+      { name: "Our Writers", href: "#", external: false },
+      { name: "Pricing", href: "#", external: false },
+      { name: "Contact", href: "#contact", external: false },
     ],
     support: [
-      { name: "FAQs", href: "#" },
-      { name: "Terms of Service", href: "#" },
-      { name: "Privacy Policy", href: "#" },
-      { name: "Refund Policy", href: "#" },
+      { name: "Support", href: "/support", external: false },
+      { name: "FAQs", href: "/faqs", external: false },
+      { name: "Terms of Service", href: "/terms", external: false },
+      { name: "Privacy Policy", href: "/privacy", external: false },
+      { name: "Refund Policy", href: "/refund", external: false },
     ],
   };
 
@@ -68,6 +75,8 @@ const Footer = () => {
                 <li key={link.name}>
                   <a
                     href={link.href}
+                    target={link.external ? "_blank" : undefined}
+                    rel={link.external ? "noopener noreferrer" : undefined}
                     className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
                   >
                     {link.name}
