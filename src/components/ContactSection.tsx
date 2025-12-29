@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Mail, MessageSquare, User, Phone } from "lucide-react";
+import { Mail, MessageSquare, User, Phone } from "lucide-react";
 import { z } from "zod";
 
 const contactSchema = z.object({
@@ -18,7 +18,6 @@ type ContactFormData = z.infer<typeof contactSchema>;
 
 const ContactSection = () => {
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof ContactFormData, string>>>({});
   const [formData, setFormData] = useState<ContactFormData>({
     name: "",
@@ -36,7 +35,17 @@ const ContactSection = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const sendViaWhatsApp = () => {
+    const whatsappMessage = `*New Inquiry from ResearchReady Website*%0A%0A*Name:* ${encodeURIComponent(formData.name)}%0A*Email:* ${encodeURIComponent(formData.email)}%0A*Subject:* ${encodeURIComponent(formData.subject)}%0A%0A*Message:*%0A${encodeURIComponent(formData.message)}`;
+    window.open(`https://wa.me/2349022282963?text=${whatsappMessage}`, '_blank');
+  };
+
+  const sendViaEmail = () => {
+    const emailBody = `Name: ${formData.name}%0AEmail: ${formData.email}%0A%0A${formData.message}`;
+    window.open(`mailto:researchreadyservices@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${emailBody}`, '_blank');
+  };
+
+  const handleSubmit = async (e: React.FormEvent, method: 'whatsapp' | 'email') => {
     e.preventDefault();
     setErrors({});
 
@@ -52,28 +61,19 @@ const ContactSection = () => {
       return;
     }
 
-    setIsSubmitting(true);
-
-    // Simulate form submission (replace with actual API call when backend is set up)
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Message Sent Successfully!",
-        description: "Thank you for contacting us. We'll get back to you within 24 hours.",
-      });
-
-      // Reset form
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
+    if (method === 'whatsapp') {
+      sendViaWhatsApp();
+    } else {
+      sendViaEmail();
     }
+    
+    toast({
+      title: "Redirecting...",
+      description: method === 'whatsapp' ? "Opening WhatsApp to send your message." : "Opening your email client.",
+    });
+
+    // Reset form
+    setFormData({ name: "", email: "", subject: "", message: "" });
   };
 
   return (
@@ -133,7 +133,7 @@ const ContactSection = () => {
 
           {/* Form Side */}
           <div className="bg-card rounded-2xl p-6 lg:p-8 shadow-lg border border-border">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form className="space-y-6">
               {/* Name Field */}
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-foreground font-medium flex items-center gap-2">
@@ -212,26 +212,29 @@ const ContactSection = () => {
                 )}
               </div>
 
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                variant="gold"
-                size="lg"
-                className="w-full"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <span className="animate-spin mr-2">⏳</span>
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    Send Message
-                    <Send className="w-5 h-5 ml-2" />
-                  </>
-                )}
-              </Button>
+              {/* Submit Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  type="button"
+                  variant="gold"
+                  size="lg"
+                  className="flex-1"
+                  onClick={(e) => handleSubmit(e, 'whatsapp')}
+                >
+                  <MessageSquare className="w-5 h-5 mr-2" />
+                  Send via WhatsApp
+                </Button>
+                <Button
+                  type="button"
+                  variant="heroOutline"
+                  size="lg"
+                  className="flex-1"
+                  onClick={(e) => handleSubmit(e, 'email')}
+                >
+                  <Mail className="w-5 h-5 mr-2" />
+                  Send via Email
+                </Button>
+              </div>
             </form>
           </div>
         </div>

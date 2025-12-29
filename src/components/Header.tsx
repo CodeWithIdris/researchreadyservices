@@ -38,8 +38,10 @@ const Header = () => {
 
           {/* CTA Button */}
           <div className="hidden lg:flex items-center gap-4">
-            <Button variant="gold" size="lg">
-              Get Started
+            <Button variant="gold" size="lg" asChild>
+              <a href="https://wa.me/2349022282963?text=Hello%2C%20I%27m%20interested%20in%20your%20research%20services" target="_blank" rel="noopener noreferrer">
+                Get Started
+              </a>
             </Button>
           </div>
 
@@ -71,8 +73,10 @@ const Header = () => {
                   {link.name}
                 </a>
               ))}
-              <Button variant="gold" size="lg" className="mt-2">
-                Get Started
+              <Button variant="gold" size="lg" className="mt-2" asChild>
+                <a href="https://wa.me/2349022282963?text=Hello%2C%20I%27m%20interested%20in%20your%20research%20services" target="_blank" rel="noopener noreferrer">
+                  Get Started
+                </a>
               </Button>
             </div>
           </nav>
