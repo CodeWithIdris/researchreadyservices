@@ -17,10 +17,9 @@ const Footer = () => {
       { name: "Research Analysis", href: getServiceWhatsAppLink("Research Analysis"), external: true },
     ],
     company: [
-      { name: "About Us", href: "#", external: false },
-      { name: "Our Writers", href: "#", external: false },
-      { name: "Pricing", href: "#", external: false },
-      { name: "Contact", href: "#contact", external: false },
+      { name: "About Us", href: "/about", external: false },
+      { name: "Our Writers", href: "/about#team", external: false },
+      { name: "Contact", href: "/#contact", external: false },
     ],
     support: [
       { name: "Support", href: "/support", external: false },
