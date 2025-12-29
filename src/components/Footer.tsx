@@ -32,10 +32,9 @@ const Footer = () => {
   };
 
   const socialLinks = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Instagram, href: "#", label: "Instagram" },
+    { icon: Facebook, href: "https://web.facebook.com/profile.php?id=61577783386641", label: "Facebook" },
+    { icon: Twitter, href: "https://x.com/_researchready", label: "X (Twitter)" },
+    { icon: Instagram, href: "https://www.instagram.com/researchready_services/", label: "Instagram" },
   ];
 
   return (
