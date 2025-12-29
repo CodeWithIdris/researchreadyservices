@@ -1,34 +1,9 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import NewsletterSignup from "@/components/NewsletterSignup";
 import { Users, Target, Award, BookOpen, GraduationCap, Heart } from "lucide-react";
 
 const AboutUs = () => {
-  const teamMembers = [
-    {
-      name: "Dr. Adebayo Oluwaseun",
-      role: "Founder & Lead Research Consultant",
-      bio: "PhD in Business Administration with over 15 years of experience in academic research and dissertation supervision.",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
-    },
-    {
-      name: "Dr. Chidinma Okonkwo",
-      role: "Senior Editor & Quality Assurance Lead",
-      bio: "PhD in English Literature, specializing in academic writing standards and thesis editing for over 12 years.",
-      image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=300&h=300&fit=crop&crop=face"
-    },
-    {
-      name: "Prof. Emeka Nwachukwu",
-      role: "Statistical Analysis Director",
-      bio: "Professor of Statistics with expertise in SPSS, R, and advanced quantitative research methods.",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face"
-    },
-    {
-      name: "Dr. Funke Adeyemi",
-      role: "Literature Review Specialist",
-      bio: "PhD in Social Sciences with a passion for comprehensive literature synthesis and systematic reviews.",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&h=300&fit=crop&crop=face"
-    },
-  ];
 
   const milestones = [
     { year: "2014", title: "Founded in Lagos", description: "ResearchReady was established to support African researchers in achieving academic excellence." },
@@ -162,35 +137,10 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Team Section */}
+      {/* Newsletter Section */}
       <section className="py-16 lg:py-24 bg-muted/30">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="font-playfair text-3xl lg:text-4xl font-bold text-primary mb-4">
-              Meet Our Team
-            </h2>
-            <p className="text-muted-foreground">
-              A dedicated team of experts committed to your academic success.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {teamMembers.map((member, index) => (
-              <div key={index} className="bg-background rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="aspect-square overflow-hidden">
-                  <img 
-                    src={member.image} 
-                    alt={member.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="font-semibold text-primary mb-1">{member.name}</h3>
-                  <p className="text-sm text-accent font-medium mb-3">{member.role}</p>
-                  <p className="text-sm text-muted-foreground">{member.bio}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <NewsletterSignup />
         </div>
       </section>
 
