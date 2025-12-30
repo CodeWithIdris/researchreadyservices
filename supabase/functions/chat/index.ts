@@ -6,6 +6,70 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const SYSTEM_PROMPT = `You are a helpful customer support assistant for ResearchReady, a professional academic research and writing service company. 
+
+Your role is to:
+- Answer questions about our services (thesis writing, dissertation help, research papers, literature reviews, data analysis, editing & proofreading)
+- Help visitors understand our process and pricing
+- Collect information about their research needs
+- Be friendly, professional, and encouraging
+- If asked about specific pricing, explain that pricing depends on the project scope and encourage them to fill out a project request form or contact us directly
+
+Keep responses concise (2-3 sentences max) and helpful. Always maintain a professional yet warm tone.`;
+
+async function generateAIResponse(messages: Array<{sender_type: string, message: string}>): Promise<string> {
+  const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+  
+  if (!lovableApiKey) {
+    console.error("LOVABLE_API_KEY not configured");
+    return "Thank you for your message! Our team will get back to you shortly. In the meantime, feel free to explore our services or fill out our project request form.";
+  }
+
+  try {
+    // Convert chat history to API format
+    const chatHistory = messages.map(msg => ({
+      role: msg.sender_type === "visitor" ? "user" : "assistant",
+      content: msg.message
+    }));
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${lovableApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          ...chatHistory
+        ],
+        max_tokens: 150,
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("AI API error:", response.status, errorText);
+      return "Thank you for reaching out! Our support team is here to help. Could you tell us more about your research project?";
+    }
+
+    const data = await response.json();
+    const aiMessage = data.choices?.[0]?.message?.content;
+    
+    if (!aiMessage) {
+      console.error("No AI response content:", data);
+      return "Thanks for your message! How can I assist you with your research project today?";
+    }
+
+    return aiMessage.trim();
+  } catch (error) {
+    console.error("Error generating AI response:", error);
+    return "Thank you for your message! Our team is ready to help with your research needs. What type of project are you working on?";
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -132,7 +196,8 @@ serve(async (req) => {
           );
         }
 
-        const { data, error } = await supabase
+        // Save visitor's message
+        const { data: visitorMessage, error: visitorError } = await supabase
           .from("chat_messages")
           .insert({
             session_id,
@@ -142,8 +207,8 @@ serve(async (req) => {
           .select()
           .single();
 
-        if (error) {
-          console.error("Error sending message:", error);
+        if (visitorError) {
+          console.error("Error sending message:", visitorError);
           return new Response(
             JSON.stringify({ error: "Failed to send message" }),
             { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -151,8 +216,32 @@ serve(async (req) => {
         }
 
         console.log(`Message sent in session: ${session_id}`);
+
+        // Only generate AI response for visitor messages
+        if (sender_type === "visitor" || !sender_type) {
+          // Fetch conversation history for context
+          const { data: chatHistory } = await supabase
+            .from("chat_messages")
+            .select("sender_type, message")
+            .eq("session_id", session_id)
+            .order("created_at", { ascending: true })
+            .limit(20); // Limit context to last 20 messages
+
+          // Generate AI response
+          const aiResponse = await generateAIResponse(chatHistory || []);
+
+          // Save AI response
+          await supabase.from("chat_messages").insert({
+            session_id,
+            sender_type: "support",
+            message: aiResponse,
+          });
+
+          console.log(`AI response generated for session: ${session_id}`);
+        }
+
         return new Response(
-          JSON.stringify({ message: data }),
+          JSON.stringify({ message: visitorMessage }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
