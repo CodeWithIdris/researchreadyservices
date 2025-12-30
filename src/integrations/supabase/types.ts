@@ -52,7 +52,6 @@ export type Database = {
           id: string
           status: string
           updated_at: string
-          visitor_email: string | null
           visitor_id: string
           visitor_name: string | null
         }
@@ -61,7 +60,6 @@ export type Database = {
           id?: string
           status?: string
           updated_at?: string
-          visitor_email?: string | null
           visitor_id: string
           visitor_name?: string | null
         }
@@ -70,7 +68,6 @@ export type Database = {
           id?: string
           status?: string
           updated_at?: string
-          visitor_email?: string | null
           visitor_id?: string
           visitor_name?: string | null
         }
