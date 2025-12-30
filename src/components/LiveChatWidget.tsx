@@ -21,6 +21,7 @@ const LiveChatWidget = () => {
   const [visitorId, setVisitorId] = useState<string>("");
   const [visitorName, setVisitorName] = useState("");
   const [hasStartedChat, setHasStartedChat] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -36,9 +37,7 @@ const LiveChatWidget = () => {
     // Check for existing session
     const storedSessionId = localStorage.getItem("chat_session_id");
     if (storedSessionId) {
-      setSessionId(storedSessionId);
-      setHasStartedChat(true);
-      loadMessages(storedSessionId);
+      verifyAndLoadSession(storedVisitorId, storedSessionId);
     }
   }, []);
 
@@ -59,9 +58,11 @@ const LiveChatWidget = () => {
         (payload) => {
           const newMsg = payload.new as Message;
           setMessages((prev) => {
-            // Avoid duplicates
             if (prev.some((m) => m.id === newMsg.id)) return prev;
-            return [...prev, newMsg];
+            return [...prev, {
+              ...newMsg,
+              sender_type: newMsg.sender_type as "visitor" | "support"
+            }];
           });
         }
       )
@@ -77,23 +78,45 @@ const LiveChatWidget = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const loadMessages = async (sid: string) => {
-    const { data, error } = await supabase
-      .from("chat_messages")
-      .select("*")
-      .eq("session_id", sid)
-      .order("created_at", { ascending: true });
+  const verifyAndLoadSession = async (vId: string, sId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("chat", {
+        body: { action: "verify_session", visitor_id: vId, session_id: sId },
+      });
 
-    if (error) {
-      console.error("Error loading messages:", error);
-      return;
+      if (error || !data?.valid) {
+        localStorage.removeItem("chat_session_id");
+        return;
+      }
+
+      setSessionId(sId);
+      setHasStartedChat(true);
+      loadMessages(vId, sId);
+    } catch (error) {
+      console.error("Error verifying session:", error);
+      localStorage.removeItem("chat_session_id");
     }
+  };
 
-    if (data) {
-      setMessages(data.map(msg => ({
-        ...msg,
-        sender_type: msg.sender_type as "visitor" | "support"
-      })));
+  const loadMessages = async (vId: string, sId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("chat", {
+        body: { action: "get_messages", visitor_id: vId, session_id: sId },
+      });
+
+      if (error) {
+        console.error("Error loading messages:", error);
+        return;
+      }
+
+      if (data?.messages) {
+        setMessages(data.messages.map((msg: Message) => ({
+          ...msg,
+          sender_type: msg.sender_type as "visitor" | "support"
+        })));
+      }
+    } catch (error) {
+      console.error("Error loading messages:", error);
     }
   };
 
@@ -107,37 +130,34 @@ const LiveChatWidget = () => {
       return;
     }
 
-    const { data, error } = await supabase
-      .from("chat_sessions")
-      .insert({
-        visitor_id: visitorId,
-        visitor_name: visitorName.trim(),
-      })
-      .select()
-      .single();
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("chat", {
+        body: { 
+          action: "create_session", 
+          visitor_id: visitorId, 
+          visitor_name: visitorName.trim() 
+        },
+      });
 
-    if (error) {
+      if (error || !data?.session) {
+        throw new Error("Failed to create session");
+      }
+
+      setSessionId(data.session.id);
+      localStorage.setItem("chat_session_id", data.session.id);
+      setHasStartedChat(true);
+      loadMessages(visitorId, data.session.id);
+    } catch (error) {
       console.error("Error creating session:", error);
       toast({
         title: "Error",
         description: "Failed to start chat. Please try again.",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsLoading(false);
     }
-
-    setSessionId(data.id);
-    localStorage.setItem("chat_session_id", data.id);
-    setHasStartedChat(true);
-
-    // Send welcome message from support
-    await supabase.from("chat_messages").insert({
-      session_id: data.id,
-      sender_type: "support",
-      message: `Hello ${visitorName}! Welcome to ResearchReady. How can we help you today?`,
-    });
-
-    loadMessages(data.id);
   };
 
   const sendMessage = async () => {
@@ -146,13 +166,21 @@ const LiveChatWidget = () => {
     const messageText = newMessage.trim();
     setNewMessage("");
 
-    const { error } = await supabase.from("chat_messages").insert({
-      session_id: sessionId,
-      sender_type: "visitor",
-      message: messageText,
-    });
+    try {
+      const { error } = await supabase.functions.invoke("chat", {
+        body: {
+          action: "send_message",
+          visitor_id: visitorId,
+          session_id: sessionId,
+          message: messageText,
+          sender_type: "visitor",
+        },
+      });
 
-    if (error) {
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
       console.error("Error sending message:", error);
       toast({
         title: "Error",
@@ -235,9 +263,15 @@ const LiveChatWidget = () => {
                   value={visitorName}
                   onChange={(e) => setVisitorName(e.target.value)}
                   onKeyPress={handleKeyPress}
+                  disabled={isLoading}
                 />
-                <Button onClick={startChat} className="w-full" variant="gold">
-                  Start Chat
+                <Button 
+                  onClick={startChat} 
+                  className="w-full" 
+                  variant="gold"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Starting..." : "Start Chat"}
                 </Button>
               </div>
             </div>
