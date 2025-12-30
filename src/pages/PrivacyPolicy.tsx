@@ -1,9 +1,16 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
+import SEOHead from "@/components/SEOHead";
 
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead 
+        title="Privacy Policy"
+        description="Learn how ResearchReady collects, uses, and protects your personal information. We are committed to maintaining your privacy and data security."
+        url="https://researchready.com/privacy"
+      />
       <Header />
       <main className="pt-24 pb-20">
         <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
@@ -101,6 +108,7 @@ const PrivacyPolicy = () => {
         </div>
       </main>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

@@ -1,9 +1,16 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
+import SEOHead from "@/components/SEOHead";
 
 const RefundPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead 
+        title="Refund Policy"
+        description="Understand ResearchReady's refund policy. Learn about our money-back guarantee and the conditions for requesting refunds on our services."
+        url="https://researchready.com/refund"
+      />
       <Header />
       <main className="pt-24 pb-20">
         <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
@@ -99,6 +106,7 @@ const RefundPolicy = () => {
         </div>
       </main>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

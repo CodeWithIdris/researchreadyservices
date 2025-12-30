@@ -1,9 +1,16 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
+import SEOHead from "@/components/SEOHead";
 
 const TermsOfService = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead 
+        title="Terms of Service"
+        description="Read ResearchReady's terms of service. Understand your rights and responsibilities when using our academic writing and research support services."
+        url="https://researchready.com/terms"
+      />
       <Header />
       <main className="pt-24 pb-20">
         <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
@@ -86,6 +93,7 @@ const TermsOfService = () => {
         </div>
       </main>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

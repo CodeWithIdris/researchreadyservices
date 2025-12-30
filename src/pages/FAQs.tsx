@@ -1,5 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
+import SEOHead from "@/components/SEOHead";
 import {
   Accordion,
   AccordionContent,
@@ -45,6 +47,11 @@ const faqs = [
 const FAQs = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead 
+        title="FAQs - Frequently Asked Questions"
+        description="Find answers to common questions about ResearchReady's academic writing services, pricing, turnaround times, and quality guarantees."
+        url="https://researchready.com/faqs"
+      />
       <Header />
       <main className="pt-24 pb-20">
         <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
@@ -90,6 +97,7 @@ const FAQs = () => {
         </div>
       </main>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

@@ -1,6 +1,8 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NewsletterSignup from "@/components/NewsletterSignup";
+import ScrollToTop from "@/components/ScrollToTop";
+import SEOHead from "@/components/SEOHead";
 import { Users, Target, Award, BookOpen, GraduationCap, Heart } from "lucide-react";
 
 const AboutUs = () => {
@@ -23,6 +25,11 @@ const AboutUs = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead 
+        title="About Us - Our Story & Mission"
+        description="Learn about ResearchReady's journey since 2014. Discover our mission to empower African researchers with world-class academic writing and research support services."
+        url="https://researchready.com/about"
+      />
       <Header />
       
       {/* Hero Section */}
@@ -169,6 +176,7 @@ const AboutUs = () => {
       </section>
 
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

@@ -7,10 +7,14 @@ import ContactSection from "@/components/ContactSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 import LiveChatWidget from "@/components/LiveChatWidget";
+import ScrollToTop from "@/components/ScrollToTop";
+import CookieConsent from "@/components/CookieConsent";
+import SEOHead from "@/components/SEOHead";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead />
       <Header />
       <main>
         <HeroSection />
@@ -21,7 +25,9 @@ const Index = () => {
         <CTASection />
       </main>
       <Footer />
+      <ScrollToTop />
       <LiveChatWidget />
+      <CookieConsent />
     </div>
   );
 };
