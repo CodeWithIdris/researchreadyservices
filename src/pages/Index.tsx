@@ -6,6 +6,7 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import ContactSection from "@/components/ContactSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
+import LiveChatWidget from "@/components/LiveChatWidget";
 
 const Index = () => {
   return (
@@ -20,6 +21,7 @@ const Index = () => {
         <CTASection />
       </main>
       <Footer />
+      <LiveChatWidget />
     </div>
   );
 };

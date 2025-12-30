@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, Phone } from "lucide-react";
+import ProjectRequestForm from "@/components/ProjectRequestForm";
 
 const CTASection = () => {
   return (
@@ -29,11 +30,7 @@ const CTASection = () => {
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </a>
             </Button>
-            <Button variant="heroOutline" size="xl" asChild>
-              <a href="#services">
-                View Pricing
-              </a>
-            </Button>
+            <ProjectRequestForm />
           </div>
 
           {/* Contact Info */}
