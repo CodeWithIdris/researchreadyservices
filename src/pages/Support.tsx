@@ -1,5 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
+import SEOHead from "@/components/SEOHead";
 import { Mail, Phone, MessageCircle, Clock } from "lucide-react";
 
 const Support = () => {
@@ -7,6 +9,11 @@ const Support = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead 
+        title="Support Center - Get Help"
+        description="Need help with your research project? Contact ResearchReady support via WhatsApp, email, or phone. We're here to assist you 24/7."
+        url="https://researchready.com/support"
+      />
       <Header />
       <main className="pt-24 pb-20">
         <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
@@ -108,6 +115,7 @@ const Support = () => {
         </div>
       </main>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };
