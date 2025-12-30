@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle } from "lucide-react";
+import ProjectRequestForm from "@/components/ProjectRequestForm";
 
 const HeroSection = () => {
   const highlights = [
@@ -55,11 +56,7 @@ const HeroSection = () => {
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </a>
               </Button>
-              <Button variant="heroOutline" size="xl" asChild>
-                <a href="#services">
-                  View Our Services
-                </a>
-              </Button>
+              <ProjectRequestForm />
             </div>
 
             {/* Trust Indicators */}
