@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, CheckCircle } from "lucide-react";
+import { Mail, CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 
 const emailSchema = z.string().trim().email({ message: "Please enter a valid email address" }).max(255);
@@ -10,9 +11,10 @@ const emailSchema = z.string().trim().email({ message: "Please enter a valid ema
 const NewsletterSignup = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const result = emailSchema.safeParse(email);
@@ -25,12 +27,34 @@ const NewsletterSignup = () => {
       return;
     }
 
-    // For now, just show success (you can integrate with an email service later)
-    setIsSubmitted(true);
-    toast({
-      title: "Subscribed!",
-      description: "Thank you for subscribing to our newsletter.",
-    });
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.functions.invoke("chat", {
+        body: { 
+          action: "subscribe_newsletter", 
+          email: result.data 
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setIsSubmitted(true);
+      toast({
+        title: "Subscribed!",
+        description: "Thank you for subscribing to our newsletter.",
+      });
+    } catch (error) {
+      console.error("Newsletter subscription error:", error);
+      toast({
+        title: "Subscription failed",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isSubmitted) {
@@ -70,9 +94,17 @@ const NewsletterSignup = () => {
             onChange={(e) => setEmail(e.target.value)}
             className="flex-1"
             required
+            disabled={isLoading}
           />
-          <Button type="submit" variant="gold">
-            Subscribe
+          <Button type="submit" variant="gold" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Subscribing...
+              </>
+            ) : (
+              "Subscribe"
+            )}
           </Button>
         </form>
         <p className="text-xs text-muted-foreground mt-4">

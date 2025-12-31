@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageCircle, X, Send, Minimize2 } from "lucide-react";
+import { MessageCircle, X, Send, Minimize2, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -11,6 +11,18 @@ interface Message {
   message: string;
   created_at: string;
 }
+
+const TypingIndicator = () => (
+  <div className="flex justify-start">
+    <div className="bg-muted text-foreground rounded-2xl rounded-bl-md px-4 py-3">
+      <div className="flex items-center gap-1">
+        <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+        <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+        <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+      </div>
+    </div>
+  </div>
+);
 
 const LiveChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,6 +34,8 @@ const LiveChatWidget = () => {
   const [visitorName, setVisitorName] = useState("");
   const [hasStartedChat, setHasStartedChat] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const pollingRef = useRef<number | null>(null);
   const { toast } = useToast();
@@ -42,14 +56,14 @@ const LiveChatWidget = () => {
     }
   }, []);
 
-  // Scroll to bottom when messages change
+  // Scroll to bottom when messages change or typing indicator appears
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isTyping]);
 
   // Poll for new messages when chat is active
   const pollMessages = useCallback(async () => {
-    if (!sessionId || !visitorId) return;
+    if (!sessionId || !visitorId || isSending) return;
 
     try {
       const { data, error } = await supabase.functions.invoke("chat", {
@@ -57,21 +71,31 @@ const LiveChatWidget = () => {
       });
 
       if (!error && data?.messages) {
-        setMessages(data.messages.map((msg: Message) => ({
+        const newMessages = data.messages.map((msg: Message) => ({
           ...msg,
           sender_type: msg.sender_type as "visitor" | "support"
-        })));
+        }));
+        
+        // Check if we received a new support message (AI response)
+        const currentSupportCount = messages.filter(m => m.sender_type === "support").length;
+        const newSupportCount = newMessages.filter((m: Message) => m.sender_type === "support").length;
+        
+        if (newSupportCount > currentSupportCount) {
+          setIsTyping(false);
+        }
+        
+        setMessages(newMessages);
       }
     } catch (error) {
       console.error("Error polling messages:", error);
     }
-  }, [sessionId, visitorId]);
+  }, [sessionId, visitorId, isSending, messages]);
 
   // Set up polling when session is active
   useEffect(() => {
     if (sessionId && hasStartedChat && isOpen && !isMinimized) {
-      // Poll every 3 seconds
-      pollingRef.current = window.setInterval(pollMessages, 3000);
+      // Poll every 2 seconds for faster response
+      pollingRef.current = window.setInterval(pollMessages, 2000);
       
       return () => {
         if (pollingRef.current) {
@@ -165,10 +189,11 @@ const LiveChatWidget = () => {
   };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !sessionId) return;
+    if (!newMessage.trim() || !sessionId || isSending) return;
 
     const messageText = newMessage.trim();
     setNewMessage("");
+    setIsSending(true);
     
     // Optimistically add the message to UI
     const optimisticMessage: Message = {
@@ -178,6 +203,9 @@ const LiveChatWidget = () => {
       created_at: new Date().toISOString(),
     };
     setMessages(prev => [...prev, optimisticMessage]);
+    
+    // Show typing indicator
+    setIsTyping(true);
 
     try {
       const { error } = await supabase.functions.invoke("chat", {
@@ -194,8 +222,8 @@ const LiveChatWidget = () => {
         throw error;
       }
       
-      // Refresh messages after sending
-      await pollMessages();
+      // Poll immediately after sending to get AI response faster
+      setTimeout(() => pollMessages(), 500);
     } catch (error) {
       console.error("Error sending message:", error);
       toast({
@@ -206,6 +234,9 @@ const LiveChatWidget = () => {
       // Remove optimistic message and restore input
       setMessages(prev => prev.filter(m => m.id !== optimisticMessage.id));
       setNewMessage(messageText);
+      setIsTyping(false);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -290,7 +321,14 @@ const LiveChatWidget = () => {
                   variant="gold"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Starting..." : "Start Chat"}
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Starting...
+                    </>
+                  ) : (
+                    "Start Chat"
+                  )}
                 </Button>
               </div>
             </div>
@@ -298,8 +336,9 @@ const LiveChatWidget = () => {
             <>
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
-                {messages.length === 0 && (
+                {messages.length === 0 && !isTyping && (
                   <div className="text-center text-muted-foreground text-sm py-4">
+                    <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
                     Loading messages...
                   </div>
                 )}
@@ -321,6 +360,7 @@ const LiveChatWidget = () => {
                     </div>
                   </div>
                 ))}
+                {isTyping && <TypingIndicator />}
                 <div ref={messagesEndRef} />
               </div>
 
@@ -333,15 +373,20 @@ const LiveChatWidget = () => {
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     className="flex-1 text-base"
+                    disabled={isSending}
                   />
                   <Button
                     onClick={sendMessage}
                     size="icon"
                     variant="gold"
-                    disabled={!newMessage.trim()}
+                    disabled={!newMessage.trim() || isSending}
                     className="shrink-0"
                   >
-                    <Send className="w-4 h-4" />
+                    {isSending ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Send className="w-4 h-4" />
+                    )}
                   </Button>
                 </div>
               </div>
