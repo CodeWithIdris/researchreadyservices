@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Loader2, LogOut, MessageSquare, Ticket, Mail, Users, 
-  Calendar, Clock, RefreshCw, Eye 
+  Calendar, Clock, RefreshCw, Eye, Bell 
 } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
 
@@ -61,8 +61,96 @@ const AdminDashboard = () => {
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const [sessionMessages, setSessionMessages] = useState<Message[]>([]);
   const [isMessagesLoading, setIsMessagesLoading] = useState(false);
+  const [newActivityCount, setNewActivityCount] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Real-time subscription setup
+  const setupRealtimeSubscriptions = useCallback(() => {
+    console.log("Setting up real-time subscriptions...");
+    
+    // Subscribe to new chat sessions
+    const sessionsChannel = supabase
+      .channel('admin-sessions')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'chat_sessions' },
+        (payload) => {
+          console.log("New chat session:", payload.new);
+          const newSession = payload.new as ChatSession;
+          newSession.chat_messages = [{ count: 0 }];
+          setSessions(prev => [newSession, ...prev]);
+          setNewActivityCount(prev => prev + 1);
+          toast({
+            title: "💬 New Chat Session",
+            description: `${newSession.visitor_name || 'A visitor'} started a chat`,
+          });
+        }
+      )
+      .subscribe();
+
+    // Subscribe to new tickets
+    const ticketsChannel = supabase
+      .channel('admin-tickets')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'support_tickets' },
+        (payload) => {
+          console.log("New ticket:", payload.new);
+          const newTicket = payload.new as SupportTicket;
+          setTickets(prev => [newTicket, ...prev]);
+          setNewActivityCount(prev => prev + 1);
+          toast({
+            title: "🎫 New Support Ticket",
+            description: newTicket.subject,
+            variant: newTicket.priority === 'high' ? 'destructive' : 'default',
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'support_tickets' },
+        (payload) => {
+          console.log("Ticket updated:", payload.new);
+          const updatedTicket = payload.new as SupportTicket;
+          setTickets(prev => prev.map(t => t.id === updatedTicket.id ? updatedTicket : t));
+        }
+      )
+      .subscribe();
+
+    // Subscribe to new messages (for updating message counts)
+    const messagesChannel = supabase
+      .channel('admin-messages')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'chat_messages' },
+        (payload) => {
+          console.log("New message:", payload.new);
+          const newMessage = payload.new as Message & { session_id: string };
+          
+          // Update message count for the session
+          setSessions(prev => prev.map(s => {
+            if (s.id === newMessage.session_id) {
+              const currentCount = s.chat_messages?.[0]?.count || 0;
+              return { ...s, chat_messages: [{ count: currentCount + 1 }] };
+            }
+            return s;
+          }));
+
+          // If viewing this session, add the message
+          if (selectedSession === newMessage.session_id) {
+            setSessionMessages(prev => [...prev, newMessage]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(sessionsChannel);
+      supabase.removeChannel(ticketsChannel);
+      supabase.removeChannel(messagesChannel);
+    };
+  }, [selectedSession, toast]);
 
   useEffect(() => {
     checkAuthAndLoad();
@@ -103,6 +191,14 @@ const AdminDashboard = () => {
 
     loadData();
   };
+
+  // Setup realtime subscriptions after authentication
+  useEffect(() => {
+    if (!isLoading && sessions.length >= 0) {
+      const cleanup = setupRealtimeSubscriptions();
+      return cleanup;
+    }
+  }, [isLoading, setupRealtimeSubscriptions]);
 
   const loadData = async () => {
     setIsRefreshing(true);
@@ -223,14 +319,22 @@ const AdminDashboard = () => {
         {/* Header */}
         <header className="bg-background border-b border-border sticky top-0 z-10">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 className="font-playfair text-xl font-bold text-primary">
-              ResearchReady Admin
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="font-playfair text-xl font-bold text-primary">
+                ResearchReady Admin
+              </h1>
+              {newActivityCount > 0 && (
+                <Badge variant="destructive" className="animate-pulse">
+                  <Bell className="w-3 h-3 mr-1" />
+                  {newActivityCount} new
+                </Badge>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <Button 
                 variant="outline" 
                 size="sm" 
-                onClick={loadData}
+                onClick={() => { loadData(); setNewActivityCount(0); }}
                 disabled={isRefreshing}
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
