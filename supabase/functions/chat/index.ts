@@ -248,7 +248,45 @@ serve(async (req) => {
       }
 
       case "get_admin_data": {
-        // Get all data for admin dashboard
+        // Verify admin authorization
+        const authHeader = req.headers.get('Authorization');
+        if (!authHeader) {
+          return new Response(
+            JSON.stringify({ error: "Unauthorized - No authorization header" }),
+            { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Create a client with the user's JWT to verify their identity
+        const userSupabase = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+          global: { headers: { Authorization: authHeader } }
+        });
+
+        const { data: { user }, error: userError } = await userSupabase.auth.getUser();
+        if (userError || !user) {
+          console.error("Auth error:", userError);
+          return new Response(
+            JSON.stringify({ error: "Unauthorized - Invalid token" }),
+            { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Check if user is an admin using service role client
+        const { data: adminCheck, error: adminError } = await supabase
+          .from('admin_users')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+
+        if (adminError || !adminCheck) {
+          console.error("Admin check failed:", adminError);
+          return new Response(
+            JSON.stringify({ error: "Forbidden - Admin access required" }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // User is verified admin, get all data for dashboard
         const [sessionsResult, ticketsResult, subscribersResult] = await Promise.all([
           supabase
             .from("chat_sessions")
@@ -278,6 +316,40 @@ serve(async (req) => {
       }
 
       case "get_session_messages": {
+        // Verify admin authorization
+        const authHeader2 = req.headers.get('Authorization');
+        if (!authHeader2) {
+          return new Response(
+            JSON.stringify({ error: "Unauthorized" }),
+            { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const userSupabase2 = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+          global: { headers: { Authorization: authHeader2 } }
+        });
+
+        const { data: { user: user2 }, error: userError2 } = await userSupabase2.auth.getUser();
+        if (userError2 || !user2) {
+          return new Response(
+            JSON.stringify({ error: "Unauthorized" }),
+            { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const { data: adminCheck2 } = await supabase
+          .from('admin_users')
+          .select('id')
+          .eq('user_id', user2.id)
+          .single();
+
+        if (!adminCheck2) {
+          return new Response(
+            JSON.stringify({ error: "Forbidden - Admin access required" }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
         // Admin action to get messages for any session
         if (!session_id) {
           return new Response(
@@ -307,6 +379,40 @@ serve(async (req) => {
       }
 
       case "update_ticket_status": {
+        // Verify admin authorization
+        const authHeader3 = req.headers.get('Authorization');
+        if (!authHeader3) {
+          return new Response(
+            JSON.stringify({ error: "Unauthorized" }),
+            { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const userSupabase3 = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+          global: { headers: { Authorization: authHeader3 } }
+        });
+
+        const { data: { user: user3 }, error: userError3 } = await userSupabase3.auth.getUser();
+        if (userError3 || !user3) {
+          return new Response(
+            JSON.stringify({ error: "Unauthorized" }),
+            { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const { data: adminCheck3 } = await supabase
+          .from('admin_users')
+          .select('id')
+          .eq('user_id', user3.id)
+          .single();
+
+        if (!adminCheck3) {
+          return new Response(
+            JSON.stringify({ error: "Forbidden - Admin access required" }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
         const { ticket_id, status } = await req.json();
         
         if (!ticket_id || !status) {
