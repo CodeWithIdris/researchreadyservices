@@ -6,6 +6,43 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Rate limiting configuration
+const RATE_LIMITS = {
+  SESSION_CREATE_PER_HOUR: 5,      // Max sessions per visitor per hour
+  MESSAGES_PER_MINUTE: 10,          // Max messages per session per minute
+  NEWSLETTER_PER_HOUR: 3,           // Max newsletter attempts per email per hour
+};
+
+// In-memory rate limit store (resets on function cold start)
+const rateLimitStore: Map<string, { count: number; resetAt: number }> = new Map();
+
+function checkRateLimit(key: string, maxCount: number, windowMs: number): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const record = rateLimitStore.get(key);
+  
+  if (!record || now > record.resetAt) {
+    rateLimitStore.set(key, { count: 1, resetAt: now + windowMs });
+    return { allowed: true, remaining: maxCount - 1 };
+  }
+  
+  if (record.count >= maxCount) {
+    return { allowed: false, remaining: 0 };
+  }
+  
+  record.count++;
+  return { allowed: true, remaining: maxCount - record.count };
+}
+
+// Cleanup old entries periodically
+function cleanupRateLimitStore() {
+  const now = Date.now();
+  for (const [key, record] of rateLimitStore.entries()) {
+    if (now > record.resetAt) {
+      rateLimitStore.delete(key);
+    }
+  }
+}
+
 const SYSTEM_PROMPT = `You are a helpful customer support assistant for ResearchReady, a professional academic research and writing service company. 
 
 Your role is to:
@@ -154,6 +191,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Periodic cleanup of expired rate limit entries
+  cleanupRateLimitStore();
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -189,6 +229,17 @@ serve(async (req) => {
           return new Response(
             JSON.stringify({ error: "Invalid email format" }),
             { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Rate limit newsletter subscriptions
+        const newsletterRateKey = `newsletter:${email.toLowerCase()}`;
+        const newsletterRateCheck = checkRateLimit(newsletterRateKey, RATE_LIMITS.NEWSLETTER_PER_HOUR, 60 * 60 * 1000);
+        if (!newsletterRateCheck.allowed) {
+          console.log(`Rate limit exceeded for newsletter: ${email}`);
+          return new Response(
+            JSON.stringify({ error: "Too many subscription attempts. Please try again later." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
 
@@ -451,6 +502,17 @@ serve(async (req) => {
           );
         }
 
+        // Rate limit session creation
+        const sessionRateKey = `session:${visitor_id}`;
+        const sessionRateCheck = checkRateLimit(sessionRateKey, RATE_LIMITS.SESSION_CREATE_PER_HOUR, 60 * 60 * 1000);
+        if (!sessionRateCheck.allowed) {
+          console.log(`Rate limit exceeded for session creation: ${visitor_id}`);
+          return new Response(
+            JSON.stringify({ error: "Too many sessions created. Please try again later." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
         const { data, error } = await supabase
           .from("chat_sessions")
           .insert({ visitor_id, visitor_name: visitor_name.trim().substring(0, 100) })
@@ -527,6 +589,17 @@ serve(async (req) => {
           return new Response(
             JSON.stringify({ error: "session_id and message are required" }),
             { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Rate limit messages per session
+        const messageRateKey = `message:${session_id}`;
+        const messageRateCheck = checkRateLimit(messageRateKey, RATE_LIMITS.MESSAGES_PER_MINUTE, 60 * 1000);
+        if (!messageRateCheck.allowed) {
+          console.log(`Rate limit exceeded for messages: ${session_id}`);
+          return new Response(
+            JSON.stringify({ error: "Too many messages. Please slow down." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
 
