@@ -6,6 +6,25 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Helper function to send admin notifications
+async function sendAdminNotification(type: string, data: any) {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const response = await fetch(`${supabaseUrl}/functions/v1/send-notification`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type, data }),
+    });
+    if (!response.ok) {
+      console.error("Failed to send notification:", await response.text());
+    } else {
+      console.log(`Admin notification sent: ${type}`);
+    }
+  } catch (error) {
+    console.error("Error sending admin notification:", error);
+  }
+}
+
 // Rate limiting configuration
 const RATE_LIMITS = {
   SESSION_CREATE_PER_HOUR: 5,      // Max sessions per visitor per hour
@@ -261,6 +280,10 @@ serve(async (req) => {
         }
 
         console.log(`Newsletter subscription: ${email}`);
+        
+        // Send admin notification (non-blocking)
+        sendAdminNotification("new_subscriber", data);
+
         return new Response(
           JSON.stringify({ success: true, subscriber: data }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -292,6 +315,10 @@ serve(async (req) => {
         }
 
         console.log(`Support ticket created: ${data.id}`);
+        
+        // Send admin notification (non-blocking)
+        sendAdminNotification("new_ticket", data);
+
         return new Response(
           JSON.stringify({ success: true, ticket: data }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -535,6 +562,10 @@ serve(async (req) => {
         });
 
         console.log(`Session created: ${data.id}`);
+        
+        // Send admin notification (non-blocking)
+        sendAdminNotification("new_chat_session", data);
+
         return new Response(
           JSON.stringify({ session: data }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
