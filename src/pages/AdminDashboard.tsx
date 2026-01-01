@@ -82,6 +82,25 @@ const AdminDashboard = () => {
       navigate("/admin");
       return;
     }
+    
+    // Verify user is in admin_users table (defense in depth)
+    const { data: adminUser, error: adminError } = await supabase
+      .from('admin_users')
+      .select('id')
+      .eq('user_id', session.user.id)
+      .single();
+
+    if (adminError || !adminUser) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have admin privileges.",
+        variant: "destructive",
+      });
+      await supabase.auth.signOut();
+      navigate("/admin");
+      return;
+    }
+
     loadData();
   };
 
