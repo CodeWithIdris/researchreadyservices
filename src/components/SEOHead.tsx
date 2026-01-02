@@ -10,8 +10,8 @@ interface SEOHeadProps {
 }
 
 const SEOHead = ({
-  title = "ResearchReady - Professional Academic Research & Writing Services",
-  description = "Expert academic writing, dissertation support, literature reviews, and thesis editing services. Trusted by 10,000+ researchers across Africa. Get professional research assistance today.",
+  title = "Research Ready Services - Academic Writing & Research Experts",
+  description = "Professional academic writing services. Expert dissertation, thesis, and literature review support trusted by 10,000+ researchers across Africa.",
   keywords = "academic writing, dissertation help, thesis editing, literature review, research analysis, academic research services, Nigeria, Africa, professional writing",
   image = "/og-image.png",
   url = "https://researchready.com",
@@ -52,12 +52,13 @@ const SEOHead = ({
       {/* Canonical URL */}
       <link rel="canonical" href={url} />
 
-      {/* Structured Data */}
+      {/* Organization Schema */}
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "ProfessionalService",
-          name: "ResearchReady",
+          "@type": "Organization",
+          name: "Research Ready Services",
+          alternateName: "ResearchReady",
           description: description,
           url: url,
           logo: `${url}/logo.png`,
@@ -78,6 +79,19 @@ const SEOHead = ({
             "https://www.instagram.com/researchready_services/",
             "https://x.com/_researchready",
           ],
+        })}
+      </script>
+
+      {/* Service Schema */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Service",
+          serviceType: "Academic Writing Services",
+          provider: {
+            "@type": "Organization",
+            name: "Research Ready Services",
+          },
           areaServed: {
             "@type": "GeoCircle",
             geoMidpoint: {
@@ -87,7 +101,40 @@ const SEOHead = ({
             },
             geoRadius: "5000",
           },
-          priceRange: "$$",
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: "Academic Services",
+            itemListElement: [
+              {
+                "@type": "Offer",
+                itemOffered: {
+                  "@type": "Service",
+                  name: "Dissertation Writing",
+                },
+              },
+              {
+                "@type": "Offer",
+                itemOffered: {
+                  "@type": "Service",
+                  name: "Thesis Editing",
+                },
+              },
+              {
+                "@type": "Offer",
+                itemOffered: {
+                  "@type": "Service",
+                  name: "Literature Review",
+                },
+              },
+              {
+                "@type": "Offer",
+                itemOffered: {
+                  "@type": "Service",
+                  name: "Research Analysis",
+                },
+              },
+            ],
+          },
           aggregateRating: {
             "@type": "AggregateRating",
             ratingValue: "4.8",
