@@ -25,12 +25,12 @@ const HeroSection = () => {
                 Trusted by 10,000+ Researchers
               </span>
               <h1 className="font-playfair text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-                Elevate Your{" "}
+                <span className="text-accent">Research Ready</span> Services:{" "}
                 <span className="relative inline-block">
-                  Research
+                  Academic
                   <span className="absolute -bottom-2 left-0 w-full h-1 bg-accent rounded-full" />
                 </span>{" "}
-                to Excellence
+                Writing Experts
               </h1>
               <p className="text-lg lg:text-xl text-muted-foreground max-w-xl leading-relaxed">
                 Professional academic writing and research support services tailored for scholars, 
