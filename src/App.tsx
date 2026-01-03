@@ -13,6 +13,7 @@ import Support from "./pages/Support";
 import AboutUs from "./pages/AboutUs";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import WordChallenge from "./pages/WordChallenge";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/refund" element={<RefundPolicy />} />
           <Route path="/support" element={<Support />} />
+          <Route path="/game" element={<WordChallenge />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
