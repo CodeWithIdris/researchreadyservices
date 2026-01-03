@@ -1,4 +1,5 @@
-import { Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
+import { Facebook, Twitter, Instagram } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -41,11 +42,11 @@ const Footer = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <a href="#" className="inline-block mb-4">
+            <Link to="/" className="inline-block mb-4" aria-label="Research Ready Services Homepage">
               <span className="font-playfair text-2xl font-bold">
                 Research<span className="text-accent">Ready</span>
               </span>
-            </a>
+            </Link>
             <p className="text-primary-foreground/70 mb-6 max-w-sm">
               Empowering researchers worldwide with professional academic writing 
               and research support services since 2014.
@@ -84,38 +85,38 @@ const Footer = () => {
           </div>
 
           {/* Company Links */}
-          <div>
+          <nav aria-label="Company navigation">
             <h3 className="font-semibold mb-4">Company</h3>
             <ul className="space-y-3">
               {links.company.map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
+                  <Link
+                    to={link.href}
                     className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           {/* Support Links */}
-          <div>
+          <nav aria-label="Support navigation">
             <h3 className="font-semibold mb-4">Support</h3>
             <ul className="space-y-3">
               {links.support.map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
+                  <Link
+                    to={link.href}
                     className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
         </div>
 
         {/* Bottom Bar */}
