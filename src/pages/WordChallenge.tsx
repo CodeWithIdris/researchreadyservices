@@ -1,13 +1,14 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import SEOHead from "@/components/SEOHead";
-import { Trophy, Clock, Zap, RotateCcw, ArrowRight, Brain, Target, Sparkles } from "lucide-react";
+import { Trophy, Clock, Zap, RotateCcw, ArrowRight, Brain, Target, Sparkles, Calendar, Flame, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const academicWords = [
@@ -17,10 +18,66 @@ const academicWords = [
   "theoretical", "phenomenology", "epistemology", "ontology", "hermeneutics",
   "ethnography", "grounded", "validity", "reliability", "sampling",
   "correlation", "regression", "variable", "framework", "conceptual",
-  "scholarly", "academic", "peer-review", "publication", "manuscript",
-  "appendix", "conclusion", "discussion", "findings", "introduction",
-  "objectives", "significance", "limitations", "recommendations", "abstract"
+  "scholarly", "academic", "publication", "manuscript", "appendix", 
+  "conclusion", "discussion", "findings", "introduction", "objectives", 
+  "significance", "limitations", "recommendations", "inference", "deductive",
+  "inductive", "proposition", "postulate", "axiom", "theorem"
 ];
+
+// Seeded random for consistent daily words
+const seededRandom = (seed: number) => {
+  const x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
+};
+
+const getTodayDateString = () => {
+  const today = new Date();
+  return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+};
+
+const getDailySeed = () => {
+  const today = new Date();
+  return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+};
+
+const getDailyWords = (count: number = 15): string[] => {
+  const seed = getDailySeed();
+  const shuffled = [...academicWords];
+  
+  // Fisher-Yates shuffle with seeded random
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(seededRandom(seed + i) * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  
+  return shuffled.slice(0, count);
+};
+
+const getTimeUntilMidnight = () => {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  return tomorrow.getTime() - now.getTime();
+};
+
+const formatTimeRemaining = (ms: number) => {
+  const hours = Math.floor(ms / (1000 * 60 * 60));
+  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
+
+interface DailyStats {
+  lastPlayedDate: string;
+  dailyHighScore: number;
+  currentStreak: number;
+  longestStreak: number;
+  totalDaysPlayed: number;
+  completedToday: boolean;
+  todayScore: number;
+  todayWordsCompleted: number;
+}
 
 const getRandomWord = (usedWords: Set<string>): string => {
   const availableWords = academicWords.filter(w => !usedWords.has(w));
@@ -31,6 +88,7 @@ const getRandomWord = (usedWords: Set<string>): string => {
 };
 
 const WordChallenge = () => {
+  const [gameMode, setGameMode] = useState<"daily" | "practice">("daily");
   const [gameState, setGameState] = useState<"idle" | "playing" | "finished">("idle");
   const [currentWord, setCurrentWord] = useState("");
   const [userInput, setUserInput] = useState("");
@@ -41,43 +99,114 @@ const WordChallenge = () => {
   const [bestStreak, setBestStreak] = useState(0);
   const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [dailyWordIndex, setDailyWordIndex] = useState(0);
+  const [timeUntilReset, setTimeUntilReset] = useState(getTimeUntilMidnight());
+  
   const [highScore, setHighScore] = useState(() => {
     const saved = localStorage.getItem("wordChallengeHighScore");
     return saved ? parseInt(saved, 10) : 0;
   });
+  
+  const [dailyStats, setDailyStats] = useState<DailyStats>(() => {
+    const saved = localStorage.getItem("wordChallengeDailyStats");
+    if (saved) {
+      const stats = JSON.parse(saved) as DailyStats;
+      const today = getTodayDateString();
+      
+      // Reset if it's a new day
+      if (stats.lastPlayedDate !== today) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayString = `${yesterday.getFullYear()}-${yesterday.getMonth() + 1}-${yesterday.getDate()}`;
+        
+        // Check if streak should continue or reset
+        const newStreak = stats.lastPlayedDate === yesterdayString ? stats.currentStreak : 0;
+        
+        return {
+          ...stats,
+          completedToday: false,
+          todayScore: 0,
+          todayWordsCompleted: 0,
+          currentStreak: newStreak
+        };
+      }
+      return stats;
+    }
+    return {
+      lastPlayedDate: "",
+      dailyHighScore: 0,
+      currentStreak: 0,
+      longestStreak: 0,
+      totalDaysPlayed: 0,
+      completedToday: false,
+      todayScore: 0,
+      todayWordsCompleted: 0
+    };
+  });
+  
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  const dailyWords = useMemo(() => getDailyWords(15), []);
 
-  const startGame = useCallback(() => {
+  // Countdown timer for next daily challenge
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeUntilReset(getTimeUntilMidnight());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const startGame = useCallback((mode: "daily" | "practice") => {
+    setGameMode(mode);
     setGameState("playing");
     setScore(0);
     setTimeLeft(60);
     setWordsCompleted(0);
     setStreak(0);
     setBestStreak(0);
-    setUsedWords(new Set());
     setUserInput("");
     setIsCorrect(null);
-    const firstWord = getRandomWord(new Set());
-    setCurrentWord(firstWord);
-    setUsedWords(new Set([firstWord]));
+    
+    if (mode === "daily") {
+      setDailyWordIndex(0);
+      setCurrentWord(dailyWords[0]);
+      setUsedWords(new Set([dailyWords[0]]));
+    } else {
+      setUsedWords(new Set());
+      const firstWord = getRandomWord(new Set());
+      setCurrentWord(firstWord);
+      setUsedWords(new Set([firstWord]));
+    }
+    
     setTimeout(() => inputRef.current?.focus(), 100);
-  }, []);
+  }, [dailyWords]);
 
   const nextWord = useCallback(() => {
-    const newWord = getRandomWord(usedWords);
-    setCurrentWord(newWord);
-    setUsedWords(prev => new Set([...prev, newWord]));
+    if (gameMode === "daily") {
+      const nextIndex = dailyWordIndex + 1;
+      if (nextIndex < dailyWords.length) {
+        setDailyWordIndex(nextIndex);
+        setCurrentWord(dailyWords[nextIndex]);
+      } else {
+        // All daily words completed!
+        setGameState("finished");
+        return;
+      }
+    } else {
+      const newWord = getRandomWord(usedWords);
+      setCurrentWord(newWord);
+      setUsedWords(prev => new Set([...prev, newWord]));
+    }
     setUserInput("");
     setIsCorrect(null);
     inputRef.current?.focus();
-  }, [usedWords]);
+  }, [gameMode, dailyWordIndex, dailyWords, usedWords]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
     setUserInput(value);
 
     if (value === currentWord.toLowerCase()) {
-      // Correct!
       setIsCorrect(true);
       const streakBonus = Math.floor(streak / 3) * 5;
       const wordScore = 10 + streakBonus;
@@ -123,13 +252,39 @@ const WordChallenge = () => {
     return () => clearInterval(timer);
   }, [gameState]);
 
+  // Save scores when game ends
   useEffect(() => {
-    if (gameState === "finished" && score > highScore) {
-      setHighScore(score);
-      localStorage.setItem("wordChallengeHighScore", score.toString());
-      toast.success("🎉 New High Score!");
+    if (gameState === "finished") {
+      if (gameMode === "practice" && score > highScore) {
+        setHighScore(score);
+        localStorage.setItem("wordChallengeHighScore", score.toString());
+        toast.success("🎉 New Practice High Score!");
+      }
+      
+      if (gameMode === "daily" && !dailyStats.completedToday) {
+        const today = getTodayDateString();
+        const isNewDay = dailyStats.lastPlayedDate !== today;
+        
+        const newStats: DailyStats = {
+          lastPlayedDate: today,
+          dailyHighScore: Math.max(dailyStats.dailyHighScore, score),
+          currentStreak: isNewDay ? dailyStats.currentStreak + 1 : dailyStats.currentStreak,
+          longestStreak: Math.max(dailyStats.longestStreak, isNewDay ? dailyStats.currentStreak + 1 : dailyStats.currentStreak),
+          totalDaysPlayed: isNewDay ? dailyStats.totalDaysPlayed + 1 : dailyStats.totalDaysPlayed,
+          completedToday: true,
+          todayScore: score,
+          todayWordsCompleted: wordsCompleted
+        };
+        
+        setDailyStats(newStats);
+        localStorage.setItem("wordChallengeDailyStats", JSON.stringify(newStats));
+        
+        if (newStats.currentStreak > 1) {
+          toast.success(`🔥 ${newStats.currentStreak} day streak! Keep it up!`);
+        }
+      }
     }
-  }, [gameState, score, highScore]);
+  }, [gameState, score, highScore, gameMode, dailyStats, wordsCompleted]);
 
   const getPerformanceMessage = () => {
     if (wordsCompleted >= 20) return { title: "Academic Prodigy! 🎓", message: "You have exceptional academic vocabulary. Imagine what we could do together!" };
@@ -143,7 +298,7 @@ const WordChallenge = () => {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="Academic Word Challenge Game"
-        description="Test your academic vocabulary with our fun word typing challenge. How many research terms can you type in 60 seconds?"
+        description="Test your academic vocabulary with our fun word typing challenge. Play the daily challenge or practice mode. How many research terms can you type in 60 seconds?"
         url="https://researchready.com/game"
       />
       <Header />
@@ -166,44 +321,187 @@ const WordChallenge = () => {
 
           {/* Game Area */}
           {gameState === "idle" && (
-            <Card className="p-8 md:p-12 text-center animate-scale-in bg-card border-border">
-              <div className="space-y-6">
-                <div className="w-24 h-24 mx-auto bg-accent/20 rounded-full flex items-center justify-center">
-                  <Target className="w-12 h-12 text-accent" />
-                </div>
-                <div>
-                  <h2 className="font-playfair text-2xl font-bold text-foreground mb-2">Ready to Challenge Yourself?</h2>
-                  <p className="text-muted-foreground max-w-md mx-auto">
-                    You'll have 60 seconds to type as many academic words as possible. 
-                    Build streaks for bonus points!
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
-                  <div className="p-4 bg-secondary/50 rounded-lg">
-                    <Clock className="w-6 h-6 text-accent mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">60 Seconds</p>
+            <div className="space-y-6 animate-scale-in">
+              {/* Daily Stats Banner */}
+              {dailyStats.currentStreak > 0 && (
+                <Card className="p-4 bg-gradient-to-r from-orange-500/10 to-accent/10 border-orange-500/20">
+                  <div className="flex items-center justify-center gap-6 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <Flame className="w-5 h-5 text-orange-500" />
+                      <span className="font-semibold text-foreground">{dailyStats.currentStreak} Day Streak!</span>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Longest: {dailyStats.longestStreak} days • Total: {dailyStats.totalDaysPlayed} days played
+                    </div>
                   </div>
-                  <div className="p-4 bg-secondary/50 rounded-lg">
-                    <Zap className="w-6 h-6 text-accent mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">Streak Bonus</p>
-                  </div>
-                  <div className="p-4 bg-secondary/50 rounded-lg">
-                    <Trophy className="w-6 h-6 text-accent mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">High Score: {highScore}</p>
-                  </div>
-                </div>
+                </Card>
+              )}
 
-                <Button onClick={startGame} variant="gold" size="xl" className="group">
-                  Start Challenge
-                  <Sparkles className="w-5 h-5 ml-2 group-hover:rotate-12 transition-transform" />
-                </Button>
-              </div>
-            </Card>
+              <Tabs defaultValue="daily" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="daily" className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Daily Challenge
+                  </TabsTrigger>
+                  <TabsTrigger value="practice" className="flex items-center gap-2">
+                    <Target className="w-4 h-4" />
+                    Practice Mode
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="daily">
+                  <Card className="p-8 md:p-12 text-center bg-card border-border">
+                    <div className="space-y-6">
+                      {dailyStats.completedToday ? (
+                        <>
+                          <div className="w-24 h-24 mx-auto bg-accent/20 rounded-full flex items-center justify-center">
+                            <CheckCircle className="w-12 h-12 text-accent" />
+                          </div>
+                          <div>
+                            <h2 className="font-playfair text-2xl font-bold text-foreground mb-2">
+                              Today's Challenge Complete!
+                            </h2>
+                            <p className="text-muted-foreground max-w-md mx-auto">
+                              Great job! You scored <span className="font-bold text-accent">{dailyStats.todayScore} points</span> and 
+                              typed <span className="font-bold">{dailyStats.todayWordsCompleted} words</span>.
+                            </p>
+                          </div>
+                          
+                          <div className="p-4 bg-secondary/50 rounded-lg max-w-xs mx-auto">
+                            <p className="text-sm text-muted-foreground mb-1">Next challenge in</p>
+                            <p className="text-2xl font-bold font-mono text-accent">{formatTimeRemaining(timeUntilReset)}</p>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
+                            <div className="p-4 bg-secondary/50 rounded-lg">
+                              <Flame className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+                              <p className="text-lg font-bold text-foreground">{dailyStats.currentStreak}</p>
+                              <p className="text-xs text-muted-foreground">Day Streak</p>
+                            </div>
+                            <div className="p-4 bg-secondary/50 rounded-lg">
+                              <Trophy className="w-6 h-6 text-accent mx-auto mb-2" />
+                              <p className="text-lg font-bold text-foreground">{dailyStats.dailyHighScore}</p>
+                              <p className="text-xs text-muted-foreground">Best Daily</p>
+                            </div>
+                            <div className="p-4 bg-secondary/50 rounded-lg">
+                              <Calendar className="w-6 h-6 text-primary mx-auto mb-2" />
+                              <p className="text-lg font-bold text-foreground">{dailyStats.totalDaysPlayed}</p>
+                              <p className="text-xs text-muted-foreground">Days Played</p>
+                            </div>
+                          </div>
+
+                          <p className="text-sm text-muted-foreground">
+                            Try Practice Mode to keep improving while you wait!
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-24 h-24 mx-auto bg-accent/20 rounded-full flex items-center justify-center">
+                            <Calendar className="w-12 h-12 text-accent" />
+                          </div>
+                          <div>
+                            <h2 className="font-playfair text-2xl font-bold text-foreground mb-2">
+                              Today's Daily Challenge
+                            </h2>
+                            <p className="text-muted-foreground max-w-md mx-auto">
+                              Same {dailyWords.length} words for everyone today. Complete them all in 60 seconds 
+                              to build your streak!
+                            </p>
+                          </div>
+                          
+                          <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
+                            <div className="p-4 bg-secondary/50 rounded-lg">
+                              <Clock className="w-6 h-6 text-accent mx-auto mb-2" />
+                              <p className="text-sm text-muted-foreground">60 Seconds</p>
+                            </div>
+                            <div className="p-4 bg-secondary/50 rounded-lg">
+                              <Target className="w-6 h-6 text-accent mx-auto mb-2" />
+                              <p className="text-sm text-muted-foreground">{dailyWords.length} Words</p>
+                            </div>
+                            <div className="p-4 bg-secondary/50 rounded-lg">
+                              <Flame className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+                              <p className="text-sm text-muted-foreground">
+                                {dailyStats.currentStreak > 0 ? `${dailyStats.currentStreak} Day Streak` : "Start Streak"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <Button onClick={() => startGame("daily")} variant="gold" size="xl" className="group">
+                            Start Daily Challenge
+                            <Sparkles className="w-5 h-5 ml-2 group-hover:rotate-12 transition-transform" />
+                          </Button>
+
+                          <p className="text-xs text-muted-foreground">
+                            Resets in {formatTimeRemaining(timeUntilReset)}
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="practice">
+                  <Card className="p-8 md:p-12 text-center bg-card border-border">
+                    <div className="space-y-6">
+                      <div className="w-24 h-24 mx-auto bg-accent/20 rounded-full flex items-center justify-center">
+                        <Target className="w-12 h-12 text-accent" />
+                      </div>
+                      <div>
+                        <h2 className="font-playfair text-2xl font-bold text-foreground mb-2">Practice Mode</h2>
+                        <p className="text-muted-foreground max-w-md mx-auto">
+                          Unlimited plays with random words. Perfect for warming up or improving your skills!
+                        </p>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
+                        <div className="p-4 bg-secondary/50 rounded-lg">
+                          <Clock className="w-6 h-6 text-accent mx-auto mb-2" />
+                          <p className="text-sm text-muted-foreground">60 Seconds</p>
+                        </div>
+                        <div className="p-4 bg-secondary/50 rounded-lg">
+                          <Zap className="w-6 h-6 text-accent mx-auto mb-2" />
+                          <p className="text-sm text-muted-foreground">Streak Bonus</p>
+                        </div>
+                        <div className="p-4 bg-secondary/50 rounded-lg">
+                          <Trophy className="w-6 h-6 text-accent mx-auto mb-2" />
+                          <p className="text-sm text-muted-foreground">High Score: {highScore}</p>
+                        </div>
+                      </div>
+
+                      <Button onClick={() => startGame("practice")} variant="gold" size="xl" className="group">
+                        Start Practice
+                        <Sparkles className="w-5 h-5 ml-2 group-hover:rotate-12 transition-transform" />
+                      </Button>
+                    </div>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
           )}
 
           {gameState === "playing" && (
             <div className="space-y-6 animate-fade-in">
+              {/* Mode Indicator */}
+              <div className="text-center">
+                <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+                  gameMode === "daily" 
+                    ? "bg-accent/20 text-accent" 
+                    : "bg-secondary text-muted-foreground"
+                }`}>
+                  {gameMode === "daily" ? (
+                    <>
+                      <Calendar className="w-4 h-4" />
+                      Daily Challenge • Word {dailyWordIndex + 1}/{dailyWords.length}
+                    </>
+                  ) : (
+                    <>
+                      <Target className="w-4 h-4" />
+                      Practice Mode
+                    </>
+                  )}
+                </span>
+              </div>
+
               {/* Stats Bar */}
               <div className="grid grid-cols-4 gap-4">
                 <Card className="p-4 text-center bg-card border-border">
@@ -307,6 +605,12 @@ const WordChallenge = () => {
                   </div>
                   
                   <div>
+                    {gameMode === "daily" && (
+                      <span className="inline-flex items-center gap-2 px-3 py-1 mb-3 rounded-full text-sm font-medium bg-accent/20 text-accent">
+                        <Calendar className="w-4 h-4" />
+                        Daily Challenge Complete
+                      </span>
+                    )}
                     <h2 className="font-playfair text-3xl font-bold text-foreground mb-2">
                       {getPerformanceMessage().title}
                     </h2>
@@ -330,7 +634,14 @@ const WordChallenge = () => {
                     </div>
                   </div>
 
-                  {score >= highScore && score > 0 && (
+                  {gameMode === "daily" && dailyStats.currentStreak > 1 && (
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 text-orange-500 rounded-full font-semibold">
+                      <Flame className="w-4 h-4" />
+                      {dailyStats.currentStreak} Day Streak! 🔥
+                    </div>
+                  )}
+
+                  {gameMode === "practice" && score >= highScore && score > 0 && (
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/20 text-accent rounded-full font-semibold">
                       <Sparkles className="w-4 h-4" />
                       New High Score!
@@ -338,10 +649,17 @@ const WordChallenge = () => {
                   )}
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button onClick={startGame} variant="outline" size="lg" className="group">
-                      <RotateCcw className="w-4 h-4 mr-2" />
-                      Play Again
-                    </Button>
+                    {gameMode === "daily" ? (
+                      <Button onClick={() => startGame("practice")} variant="outline" size="lg" className="group">
+                        <Target className="w-4 h-4 mr-2" />
+                        Try Practice Mode
+                      </Button>
+                    ) : (
+                      <Button onClick={() => startGame("practice")} variant="outline" size="lg" className="group">
+                        <RotateCcw className="w-4 h-4 mr-2" />
+                        Play Again
+                      </Button>
+                    )}
                     <Button variant="gold" size="lg" className="group" asChild>
                       <a href="https://wa.me/2349022282963?text=Hello%2C%20I%20just%20played%20your%20word%20challenge%20game%20and%20I%27m%20interested%20in%20your%20academic%20writing%20services!" target="_blank" rel="noopener noreferrer">
                         Get Expert Help
@@ -349,6 +667,12 @@ const WordChallenge = () => {
                       </a>
                     </Button>
                   </div>
+
+                  {gameMode === "daily" && (
+                    <p className="text-sm text-muted-foreground">
+                      Next daily challenge in {formatTimeRemaining(timeUntilReset)}
+                    </p>
+                  )}
                 </div>
               </Card>
 
