@@ -91,6 +91,39 @@ export type Database = {
         }
         Relationships: []
       }
+      game_scores: {
+        Row: {
+          best_streak: number
+          game_mode: string
+          id: string
+          language: string
+          played_at: string
+          player_name: string
+          score: number
+          words_completed: number
+        }
+        Insert: {
+          best_streak?: number
+          game_mode?: string
+          id?: string
+          language?: string
+          played_at?: string
+          player_name: string
+          score: number
+          words_completed?: number
+        }
+        Update: {
+          best_streak?: number
+          game_mode?: string
+          id?: string
+          language?: string
+          played_at?: string
+          player_name?: string
+          score?: number
+          words_completed?: number
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           email: string

@@ -4,25 +4,19 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import SEOHead from "@/components/SEOHead";
-import { Trophy, Clock, Zap, RotateCcw, ArrowRight, Brain, Target, Sparkles, Calendar, Flame, CheckCircle } from "lucide-react";
+import { Trophy, Clock, Zap, RotateCcw, ArrowRight, Brain, Target, Sparkles, Calendar, Flame, CheckCircle, Globe, Award, Languages } from "lucide-react";
 import { toast } from "sonner";
-
-const academicWords = [
-  "dissertation", "hypothesis", "methodology", "literature", "analysis",
-  "research", "abstract", "synthesis", "empirical", "qualitative",
-  "quantitative", "bibliography", "citation", "thesis", "paradigm",
-  "theoretical", "phenomenology", "epistemology", "ontology", "hermeneutics",
-  "ethnography", "grounded", "validity", "reliability", "sampling",
-  "correlation", "regression", "variable", "framework", "conceptual",
-  "scholarly", "academic", "publication", "manuscript", "appendix", 
-  "conclusion", "discussion", "findings", "introduction", "objectives", 
-  "significance", "limitations", "recommendations", "inference", "deductive",
-  "inductive", "proposition", "postulate", "axiom", "theorem"
-];
+import { supabase } from "@/integrations/supabase/client";
+import { vocabularyData, getAllLanguages, type Word } from "@/data/vocabularyData";
+import { getAchievements, AchievementsBadgeDisplay, NewAchievementToast } from "@/components/game/Achievements";
+import { SocialShare } from "@/components/game/SocialShare";
+import { Leaderboard } from "@/components/game/Leaderboard";
 
 // Seeded random for consistent daily words
 const seededRandom = (seed: number) => {
@@ -40,11 +34,11 @@ const getDailySeed = () => {
   return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
 };
 
-const getDailyWords = (count: number = 15): string[] => {
+const getDailyWords = (language: string, count: number = 15): Word[] => {
   const seed = getDailySeed();
-  const shuffled = [...academicWords];
+  const words = vocabularyData[language]?.words || vocabularyData.english.words;
+  const shuffled = [...words];
   
-  // Fisher-Yates shuffle with seeded random
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(seededRandom(seed + i) * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -79,10 +73,18 @@ interface DailyStats {
   todayWordsCompleted: number;
 }
 
-const getRandomWord = (usedWords: Set<string>): string => {
-  const availableWords = academicWords.filter(w => !usedWords.has(w));
+interface PlayerStats {
+  totalWordsCompleted: number;
+  bestStreak: number;
+  totalGamesPlayed: number;
+  highScore: number;
+  unlockedAchievements: string[];
+}
+
+const getRandomWord = (words: Word[], usedWords: Set<string>): Word => {
+  const availableWords = words.filter(w => !usedWords.has(w.word));
   if (availableWords.length === 0) {
-    return academicWords[Math.floor(Math.random() * academicWords.length)];
+    return words[Math.floor(Math.random() * words.length)];
   }
   return availableWords[Math.floor(Math.random() * availableWords.length)];
 };
@@ -90,7 +92,8 @@ const getRandomWord = (usedWords: Set<string>): string => {
 const WordChallenge = () => {
   const [gameMode, setGameMode] = useState<"daily" | "practice">("daily");
   const [gameState, setGameState] = useState<"idle" | "playing" | "finished">("idle");
-  const [currentWord, setCurrentWord] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState("english");
+  const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [userInput, setUserInput] = useState("");
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -101,10 +104,26 @@ const WordChallenge = () => {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [dailyWordIndex, setDailyWordIndex] = useState(0);
   const [timeUntilReset, setTimeUntilReset] = useState(getTimeUntilMidnight());
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [playerName, setPlayerName] = useState("");
+  const [showNamePrompt, setShowNamePrompt] = useState(false);
   
   const [highScore, setHighScore] = useState(() => {
     const saved = localStorage.getItem("wordChallengeHighScore");
     return saved ? parseInt(saved, 10) : 0;
+  });
+  
+  const [playerStats, setPlayerStats] = useState<PlayerStats>(() => {
+    const saved = localStorage.getItem("wordChallengePlayerStats");
+    if (saved) return JSON.parse(saved);
+    return {
+      totalWordsCompleted: 0,
+      bestStreak: 0,
+      totalGamesPlayed: 0,
+      highScore: 0,
+      unlockedAchievements: [],
+    };
   });
   
   const [dailyStats, setDailyStats] = useState<DailyStats>(() => {
@@ -113,13 +132,11 @@ const WordChallenge = () => {
       const stats = JSON.parse(saved) as DailyStats;
       const today = getTodayDateString();
       
-      // Reset if it's a new day
       if (stats.lastPlayedDate !== today) {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayString = `${yesterday.getFullYear()}-${yesterday.getMonth() + 1}-${yesterday.getDate()}`;
         
-        // Check if streak should continue or reset
         const newStreak = stats.lastPlayedDate === yesterdayString ? stats.currentStreak : 0;
         
         return {
@@ -145,8 +162,13 @@ const WordChallenge = () => {
   });
   
   const inputRef = useRef<HTMLInputElement>(null);
+  const languages = getAllLanguages();
   
-  const dailyWords = useMemo(() => getDailyWords(15), []);
+  const dailyWords = useMemo(() => getDailyWords(selectedLanguage, 15), [selectedLanguage]);
+  const currentLanguageWords = useMemo(() => 
+    vocabularyData[selectedLanguage]?.words || vocabularyData.english.words,
+    [selectedLanguage]
+  );
 
   // Countdown timer for next daily challenge
   useEffect(() => {
@@ -155,6 +177,35 @@ const WordChallenge = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const checkNewAchievements = useCallback((newStats: PlayerStats) => {
+    const achievements = getAchievements({
+      wordsCompleted: newStats.totalWordsCompleted,
+      bestStreak: newStats.bestStreak,
+      totalGamesPlayed: newStats.totalGamesPlayed,
+      dailyStreak: dailyStats.currentStreak,
+      highScore: newStats.highScore,
+    });
+    
+    const newlyUnlocked = achievements.filter(
+      a => a.unlocked && !playerStats.unlockedAchievements.includes(a.id)
+    );
+    
+    if (newlyUnlocked.length > 0) {
+      newlyUnlocked.forEach(achievement => {
+        toast.custom(() => <NewAchievementToast achievement={achievement} />, {
+          duration: 4000,
+        });
+      });
+      
+      newStats.unlockedAchievements = [
+        ...playerStats.unlockedAchievements,
+        ...newlyUnlocked.map(a => a.id)
+      ];
+    }
+    
+    return newStats;
+  }, [dailyStats.currentStreak, playerStats.unlockedAchievements]);
 
   const startGame = useCallback((mode: "daily" | "practice") => {
     setGameMode(mode);
@@ -170,16 +221,16 @@ const WordChallenge = () => {
     if (mode === "daily") {
       setDailyWordIndex(0);
       setCurrentWord(dailyWords[0]);
-      setUsedWords(new Set([dailyWords[0]]));
+      setUsedWords(new Set([dailyWords[0].word]));
     } else {
       setUsedWords(new Set());
-      const firstWord = getRandomWord(new Set());
+      const firstWord = getRandomWord(currentLanguageWords, new Set());
       setCurrentWord(firstWord);
-      setUsedWords(new Set([firstWord]));
+      setUsedWords(new Set([firstWord.word]));
     }
     
     setTimeout(() => inputRef.current?.focus(), 100);
-  }, [dailyWords]);
+  }, [dailyWords, currentLanguageWords]);
 
   const nextWord = useCallback(() => {
     if (gameMode === "daily") {
@@ -188,25 +239,26 @@ const WordChallenge = () => {
         setDailyWordIndex(nextIndex);
         setCurrentWord(dailyWords[nextIndex]);
       } else {
-        // All daily words completed!
         setGameState("finished");
         return;
       }
     } else {
-      const newWord = getRandomWord(usedWords);
+      const newWord = getRandomWord(currentLanguageWords, usedWords);
       setCurrentWord(newWord);
-      setUsedWords(prev => new Set([...prev, newWord]));
+      setUsedWords(prev => new Set([...prev, newWord.word]));
     }
     setUserInput("");
     setIsCorrect(null);
     inputRef.current?.focus();
-  }, [gameMode, dailyWordIndex, dailyWords, usedWords]);
+  }, [gameMode, dailyWordIndex, dailyWords, usedWords, currentLanguageWords]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
     setUserInput(value);
 
-    if (value === currentWord.toLowerCase()) {
+    if (!currentWord) return;
+
+    if (value === currentWord.word.toLowerCase()) {
       setIsCorrect(true);
       const streakBonus = Math.floor(streak / 3) * 5;
       const wordScore = 10 + streakBonus;
@@ -223,7 +275,7 @@ const WordChallenge = () => {
       }
       
       setTimeout(nextWord, 300);
-    } else if (currentWord.toLowerCase().startsWith(value)) {
+    } else if (currentWord.word.toLowerCase().startsWith(value)) {
       setIsCorrect(null);
     } else {
       setIsCorrect(false);
@@ -255,6 +307,19 @@ const WordChallenge = () => {
   // Save scores when game ends
   useEffect(() => {
     if (gameState === "finished") {
+      // Update player stats
+      let newPlayerStats: PlayerStats = {
+        ...playerStats,
+        totalWordsCompleted: playerStats.totalWordsCompleted + wordsCompleted,
+        bestStreak: Math.max(playerStats.bestStreak, bestStreak),
+        totalGamesPlayed: playerStats.totalGamesPlayed + 1,
+        highScore: Math.max(playerStats.highScore, score),
+      };
+      
+      newPlayerStats = checkNewAchievements(newPlayerStats);
+      setPlayerStats(newPlayerStats);
+      localStorage.setItem("wordChallengePlayerStats", JSON.stringify(newPlayerStats));
+      
       if (gameMode === "practice" && score > highScore) {
         setHighScore(score);
         localStorage.setItem("wordChallengeHighScore", score.toString());
@@ -283,8 +348,40 @@ const WordChallenge = () => {
           toast.success(`🔥 ${newStats.currentStreak} day streak! Keep it up!`);
         }
       }
+      
+      // Show name prompt for leaderboard
+      if (score > 0) {
+        setShowNamePrompt(true);
+      }
     }
-  }, [gameState, score, highScore, gameMode, dailyStats, wordsCompleted]);
+  }, [gameState]);
+
+  const submitToLeaderboard = async () => {
+    if (!playerName.trim()) {
+      toast.error("Please enter your name");
+      return;
+    }
+    
+    try {
+      const { error } = await supabase.from("game_scores").insert({
+        player_name: playerName.trim(),
+        score,
+        words_completed: wordsCompleted,
+        best_streak: bestStreak,
+        language: selectedLanguage,
+        game_mode: gameMode,
+      });
+      
+      if (error) throw error;
+      
+      toast.success("Score submitted to leaderboard!");
+      setShowNamePrompt(false);
+      setShowLeaderboard(true);
+    } catch (error) {
+      console.error("Error submitting score:", error);
+      toast.error("Failed to submit score");
+    }
+  };
 
   const getPerformanceMessage = () => {
     if (wordsCompleted >= 20) return { title: "Academic Prodigy! 🎓", message: "You have exceptional academic vocabulary. Imagine what we could do together!" };
@@ -294,11 +391,21 @@ const WordChallenge = () => {
     return { title: "Keep Practicing! 💪", message: "Academic writing takes time to master. Let our experts guide you!" };
   };
 
+  const achievements = getAchievements({
+    wordsCompleted: playerStats.totalWordsCompleted,
+    bestStreak: playerStats.bestStreak,
+    totalGamesPlayed: playerStats.totalGamesPlayed,
+    dailyStreak: dailyStats.currentStreak,
+    highScore: playerStats.highScore,
+  });
+
+  const languageInfo = vocabularyData[selectedLanguage];
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Academic Word Challenge Game"
-        description="Test your academic vocabulary with our fun word typing challenge. Play the daily challenge or practice mode. How many research terms can you type in 60 seconds?"
+        title="Multilingual Academic Word Challenge Game"
+        description="Test your vocabulary in 9 languages including English, Spanish, Italian, Yoruba, Igbo, Hausa, French, German, and Portuguese. Play the daily challenge or practice mode!"
         url="https://researchready.com/game"
       />
       <Header />
@@ -309,19 +416,80 @@ const WordChallenge = () => {
           <div className="text-center mb-8 animate-fade-in">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold mb-4">
               <Brain className="w-4 h-4" />
-              Test Your Academic Vocabulary
+              Test Your Vocabulary in Multiple Languages
             </div>
             <h1 className="font-playfair text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Research Word <span className="text-accent">Challenge</span>
+              Word <span className="text-accent">Challenge</span>
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Type academic terms as fast as you can! Build streaks for bonus points and prove your scholarly prowess.
+              Type words as fast as you can! Learn meanings across 9 languages. Build streaks for bonus points.
             </p>
+            
+            {/* Quick Actions */}
+            <div className="flex flex-wrap justify-center gap-3 mt-6">
+              <Dialog open={showLeaderboard} onOpenChange={setShowLeaderboard}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Globe className="w-4 h-4" />
+                    Leaderboard
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <Leaderboard currentPlayerScore={score} />
+                </DialogContent>
+              </Dialog>
+              
+              <Dialog open={showAchievements} onOpenChange={setShowAchievements}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Award className="w-4 h-4" />
+                    Achievements
+                    <span className="bg-accent/20 text-accent px-2 py-0.5 rounded-full text-xs">
+                      {achievements.filter(a => a.unlocked).length}/{achievements.length}
+                    </span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Award className="w-5 h-5 text-accent" />
+                      Your Achievements
+                    </DialogTitle>
+                  </DialogHeader>
+                  <AchievementsBadgeDisplay achievements={achievements} showAll />
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
 
           {/* Game Area */}
           {gameState === "idle" && (
             <div className="space-y-6 animate-scale-in">
+              {/* Language Selector */}
+              <Card className="p-4 bg-card border-border">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-2">
+                    <Languages className="w-5 h-5 text-accent" />
+                    <span className="font-semibold text-foreground">Select Language</span>
+                  </div>
+                  <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {languages.map(lang => (
+                        <SelectItem key={lang.id} value={lang.id}>
+                          <span className="flex items-center gap-2">
+                            <span>{lang.flag}</span>
+                            <span>{lang.name}</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </Card>
+
               {/* Daily Stats Banner */}
               {dailyStats.currentStreak > 0 && (
                 <Card className="p-4 bg-gradient-to-r from-orange-500/10 to-accent/10 border-orange-500/20">
@@ -397,11 +565,11 @@ const WordChallenge = () => {
                       ) : (
                         <>
                           <div className="w-24 h-24 mx-auto bg-accent/20 rounded-full flex items-center justify-center">
-                            <Calendar className="w-12 h-12 text-accent" />
+                            <span className="text-4xl">{languageInfo?.flag}</span>
                           </div>
                           <div>
                             <h2 className="font-playfair text-2xl font-bold text-foreground mb-2">
-                              Today's Daily Challenge
+                              Today's {languageInfo?.name} Challenge
                             </h2>
                             <p className="text-muted-foreground max-w-md mx-auto">
                               Same {dailyWords.length} words for everyone today. Complete them all in 60 seconds 
@@ -444,12 +612,14 @@ const WordChallenge = () => {
                   <Card className="p-8 md:p-12 text-center bg-card border-border">
                     <div className="space-y-6">
                       <div className="w-24 h-24 mx-auto bg-accent/20 rounded-full flex items-center justify-center">
-                        <Target className="w-12 h-12 text-accent" />
+                        <span className="text-4xl">{languageInfo?.flag}</span>
                       </div>
                       <div>
-                        <h2 className="font-playfair text-2xl font-bold text-foreground mb-2">Practice Mode</h2>
+                        <h2 className="font-playfair text-2xl font-bold text-foreground mb-2">
+                          Practice {languageInfo?.name}
+                        </h2>
                         <p className="text-muted-foreground max-w-md mx-auto">
-                          Unlimited plays with random words. Perfect for warming up or improving your skills!
+                          Unlimited plays with random words. Perfect for learning new languages!
                         </p>
                       </div>
                       
@@ -479,7 +649,7 @@ const WordChallenge = () => {
             </div>
           )}
 
-          {gameState === "playing" && (
+          {gameState === "playing" && currentWord && (
             <div className="space-y-6 animate-fade-in">
               {/* Mode Indicator */}
               <div className="text-center">
@@ -495,8 +665,8 @@ const WordChallenge = () => {
                     </>
                   ) : (
                     <>
-                      <Target className="w-4 h-4" />
-                      Practice Mode
+                      <span>{languageInfo?.flag}</span>
+                      {languageInfo?.name} Practice
                     </>
                   )}
                 </span>
@@ -539,15 +709,15 @@ const WordChallenge = () => {
 
               {/* Word Display */}
               <Card className="p-8 md:p-12 text-center bg-gradient-to-br from-card to-secondary/20 border-border">
-                <p className="text-sm text-muted-foreground mb-4">Type this word:</p>
-                <div className="mb-8">
+                <p className="text-sm text-muted-foreground mb-2">Type this word:</p>
+                <div className="mb-4">
                   <span className="font-playfair text-4xl md:text-6xl font-bold text-foreground tracking-wider">
-                    {currentWord.split("").map((char, i) => (
+                    {currentWord.word.split("").map((char, i) => (
                       <span
                         key={i}
                         className={
                           i < userInput.length
-                            ? userInput[i] === char
+                            ? userInput[i] === char.toLowerCase()
                               ? "text-accent"
                               : "text-destructive"
                             : "text-foreground"
@@ -558,6 +728,11 @@ const WordChallenge = () => {
                     ))}
                   </span>
                 </div>
+                
+                {/* Word Meaning */}
+                <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+                  <span className="font-semibold">Meaning:</span> {currentWord.meaning}
+                </p>
                 
                 <div className="max-w-md mx-auto space-y-4">
                   <Input
@@ -598,6 +773,37 @@ const WordChallenge = () => {
 
           {gameState === "finished" && (
             <div className="space-y-8 animate-scale-in">
+              {/* Name Prompt Dialog */}
+              <Dialog open={showNamePrompt} onOpenChange={setShowNamePrompt}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-accent" />
+                      Submit to Leaderboard
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <p className="text-muted-foreground">
+                      Enter your name to submit your score of <span className="font-bold text-accent">{score} points</span> to the global leaderboard!
+                    </p>
+                    <Input
+                      placeholder="Your name"
+                      value={playerName}
+                      onChange={(e) => setPlayerName(e.target.value)}
+                      maxLength={20}
+                    />
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={() => setShowNamePrompt(false)}>
+                        Skip
+                      </Button>
+                      <Button onClick={submitToLeaderboard} className="flex-1">
+                        Submit Score
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
               <Card className="p-8 md:p-12 text-center bg-card border-border">
                 <div className="space-y-6">
                   <div className="w-24 h-24 mx-auto bg-accent/20 rounded-full flex items-center justify-center">
@@ -634,6 +840,14 @@ const WordChallenge = () => {
                     </div>
                   </div>
 
+                  {/* Social Share */}
+                  <SocialShare 
+                    score={score} 
+                    wordsCompleted={wordsCompleted} 
+                    language={languageInfo?.name || "English"}
+                    gameMode={gameMode}
+                  />
+
                   {gameMode === "daily" && dailyStats.currentStreak > 1 && (
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 text-orange-500 rounded-full font-semibold">
                       <Flame className="w-4 h-4" />
@@ -649,6 +863,10 @@ const WordChallenge = () => {
                   )}
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button variant="outline" size="lg" onClick={() => setShowLeaderboard(true)}>
+                      <Globe className="w-4 h-4 mr-2" />
+                      View Leaderboard
+                    </Button>
                     {gameMode === "daily" ? (
                       <Button onClick={() => startGame("practice")} variant="outline" size="lg" className="group">
                         <Target className="w-4 h-4 mr-2" />
@@ -675,6 +893,17 @@ const WordChallenge = () => {
                   )}
                 </div>
               </Card>
+
+              {/* Unlocked Achievements */}
+              {achievements.filter(a => a.unlocked).length > 0 && (
+                <Card className="p-6 bg-card border-border">
+                  <h3 className="font-playfair text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                    <Award className="w-5 h-5 text-accent" />
+                    Your Achievements
+                  </h3>
+                  <AchievementsBadgeDisplay achievements={achievements} />
+                </Card>
+              )}
 
               {/* CTA Section */}
               <Card className="p-8 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground border-0">
