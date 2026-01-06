@@ -91,6 +91,92 @@ export type Database = {
         }
         Relationships: []
       }
+      game_room_players: {
+        Row: {
+          best_streak: number
+          current_streak: number
+          id: string
+          is_ready: boolean
+          joined_at: string
+          player_id: string
+          player_name: string
+          room_id: string
+          score: number
+          words_completed: number
+        }
+        Insert: {
+          best_streak?: number
+          current_streak?: number
+          id?: string
+          is_ready?: boolean
+          joined_at?: string
+          player_id: string
+          player_name: string
+          room_id: string
+          score?: number
+          words_completed?: number
+        }
+        Update: {
+          best_streak?: number
+          current_streak?: number
+          id?: string
+          is_ready?: boolean
+          joined_at?: string
+          player_id?: string
+          player_name?: string
+          room_id?: string
+          score?: number
+          words_completed?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "game_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_rooms: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          game_duration: number
+          host_player_id: string
+          host_player_name: string
+          id: string
+          max_players: number
+          room_code: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          game_duration?: number
+          host_player_id: string
+          host_player_name: string
+          id?: string
+          max_players?: number
+          room_code: string
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          game_duration?: number
+          host_player_id?: string
+          host_player_name?: string
+          id?: string
+          max_players?: number
+          room_code?: string
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       game_scores: {
         Row: {
           best_streak: number
