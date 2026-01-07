@@ -649,12 +649,12 @@ serve(async (req) => {
           );
         }
 
-        // Save visitor's message
+        // Save visitor's message - ALWAYS force sender_type to "visitor" to prevent impersonation
         const { data: visitorMessage, error: visitorError } = await supabase
           .from("chat_messages")
           .insert({
             session_id,
-            sender_type: sender_type || "visitor",
+            sender_type: "visitor", // Always set to visitor, ignore client input to prevent spoofing
             message: message.trim().substring(0, 2000),
           })
           .select()
