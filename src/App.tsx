@@ -14,6 +14,7 @@ import AboutUs from "./pages/AboutUs";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import WordChallenge from "./pages/WordChallenge";
+import BookAppointment from "./pages/BookAppointment";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/refund" element={<RefundPolicy />} />
           <Route path="/support" element={<Support />} />
+          <Route path="/book" element={<BookAppointment />} />
           <Route path="/game" element={<WordChallenge />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />

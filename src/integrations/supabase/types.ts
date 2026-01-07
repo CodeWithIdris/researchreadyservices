@@ -32,6 +32,54 @@ export type Database = {
         }
         Relationships: []
       }
+      appointments: {
+        Row: {
+          appointment_date: string
+          appointment_time: string
+          appointment_type: string
+          client_email: string
+          client_name: string
+          client_phone: string | null
+          client_timezone: string
+          created_at: string
+          id: string
+          meeting_link: string | null
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time: string
+          appointment_type?: string
+          client_email: string
+          client_name: string
+          client_phone?: string | null
+          client_timezone?: string
+          created_at?: string
+          id?: string
+          meeting_link?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string
+          appointment_type?: string
+          client_email?: string
+          client_name?: string
+          client_phone?: string | null
+          client_timezone?: string
+          created_at?: string
+          id?: string
+          meeting_link?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           created_at: string
