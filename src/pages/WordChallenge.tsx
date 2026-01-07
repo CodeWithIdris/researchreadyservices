@@ -578,10 +578,10 @@ const WordChallenge = () => {
                   <div className="p-4 bg-secondary/50 rounded-lg"><p className="text-2xl font-bold text-orange-500">{bestStreak}</p><p className="text-xs text-muted-foreground">Best Streak</p></div>
                 </div>
 
-                <SocialShare score={score} wordsCompleted={wordsCompleted} language="English" gameMode={gameMode === "multiplayer" ? "practice" : gameMode} />
+                <SocialShare score={score} wordsCompleted={wordsCompleted} language="English" gameMode={gameMode} />
 
                 <div className="flex flex-wrap justify-center gap-4 mt-6">
-                  <Button onClick={() => startGame(gameMode === "daily" ? "practice" : gameMode)} variant="default">
+                  <Button onClick={() => startGame(gameMode === "multiplayer" ? "practice" : gameMode)} variant="default">
                     <RotateCcw className="w-4 h-4 mr-2" />Play Again
                   </Button>
                   <Button onClick={() => setGameState("idle")} variant="outline">Back to Menu</Button>
