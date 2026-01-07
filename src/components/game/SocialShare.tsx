@@ -5,12 +5,12 @@ interface SocialShareProps {
   score: number;
   wordsCompleted: number;
   language: string;
-  gameMode: "daily" | "practice";
+  gameMode: "daily" | "practice" | "multiplayer";
 }
 
 export const SocialShare = ({ score, wordsCompleted, language, gameMode }: SocialShareProps) => {
   const baseUrl = "https://researchready.com/game";
-  const modeText = gameMode === "daily" ? "Daily Challenge" : "Practice Mode";
+  const modeText = gameMode === "daily" ? "Daily Challenge" : gameMode === "multiplayer" ? "Multiplayer Battle" : "Practice Mode";
   
   const shareText = `🎓 I just scored ${score} points typing ${wordsCompleted} academic words in ${language} on Research Ready's Word Challenge ${modeText}! Can you beat my score? 💪`;
   
