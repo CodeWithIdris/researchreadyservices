@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Gamepad2 } from "lucide-react";
+import { Menu, X, Gamepad2, CalendarDays } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Header = () => {
@@ -10,9 +10,8 @@ const Header = () => {
     { name: "About", href: "/about" },
     { name: "Services", href: "/#services" },
     { name: "Why Us", href: "/#why-us" },
-    { name: "Testimonials", href: "/#testimonials" },
-    { name: "Contact", href: "/#contact" },
-    { name: "Word Game", href: "/game", highlight: true },
+    { name: "Book Consultation", href: "/book", icon: CalendarDays },
+    { name: "Word Game", href: "/game", highlight: true, icon: Gamepad2 },
   ];
 
   return (
@@ -39,7 +38,7 @@ const Header = () => {
                       : "text-muted-foreground hover:text-primary"
                   }`}
                 >
-                  {link.highlight && <Gamepad2 className="w-4 h-4" />}
+                  {link.icon && <link.icon className="w-4 h-4" />}
                   {link.name}
                 </Link>
               ) : (
@@ -93,7 +92,7 @@ const Header = () => {
                     }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    {link.highlight && <Gamepad2 className="w-4 h-4" />}
+                    {link.icon && <link.icon className="w-4 h-4" />}
                     {link.name}
                   </Link>
                 ) : (

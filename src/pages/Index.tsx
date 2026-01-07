@@ -10,6 +10,7 @@ import LiveChatWidget from "@/components/LiveChatWidget";
 import ScrollToTop from "@/components/ScrollToTop";
 import CookieConsent from "@/components/CookieConsent";
 import SEOHead from "@/components/SEOHead";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 const Index = () => {
   return (
@@ -27,6 +28,7 @@ const Index = () => {
       <Footer />
       <ScrollToTop />
       <LiveChatWidget />
+      <WhatsAppButton />
       <CookieConsent />
     </div>
   );
