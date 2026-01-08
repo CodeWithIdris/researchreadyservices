@@ -139,6 +139,60 @@ export type Database = {
         }
         Relationships: []
       }
+      client_projects: {
+        Row: {
+          amount: number | null
+          amount_paid: number | null
+          assigned_expert: string | null
+          client_id: string
+          created_at: string
+          deadline: string | null
+          description: string | null
+          id: string
+          notes: string | null
+          payment_status: string
+          progress: number
+          project_type: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          amount_paid?: number | null
+          assigned_expert?: string | null
+          client_id: string
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          payment_status?: string
+          progress?: number
+          project_type?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          amount_paid?: number | null
+          assigned_expert?: string | null
+          client_id?: string
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          payment_status?: string
+          progress?: number
+          project_type?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       game_room_players: {
         Row: {
           best_streak: number
@@ -278,6 +332,65 @@ export type Database = {
           subscribed_at?: string
         }
         Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      project_updates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          project_id: string
+          title: string
+          update_type: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          project_id: string
+          title: string
+          update_type?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          project_id?: string
+          title?: string
+          update_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_updates_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "client_projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       support_tickets: {
         Row: {
