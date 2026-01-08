@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Gamepad2, CalendarDays } from "lucide-react";
+import { Menu, X, Gamepad2, CalendarDays, LayoutDashboard, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useAuth();
 
   const navLinks = [
     { name: "About", href: "/about" },
     { name: "Services", href: "/#services" },
-    { name: "Why Us", href: "/#why-us" },
     { name: "Book Consultation", href: "/book", icon: CalendarDays },
     { name: "Word Game", href: "/game", highlight: true, icon: Gamepad2 },
   ];
@@ -53,9 +54,24 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden lg:flex items-center gap-4">
-            <Button variant="gold" size="lg" asChild>
+          {/* CTA Buttons */}
+          <div className="hidden lg:flex items-center gap-3">
+            {user ? (
+              <Button variant="outline" asChild>
+                <Link to="/dashboard">
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  My Dashboard
+                </Link>
+              </Button>
+            ) : (
+              <Button variant="outline" asChild>
+                <Link to="/auth">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Client Login
+                </Link>
+              </Button>
+            )}
+            <Button variant="gold" asChild>
               <a href="https://wa.me/2349022282963?text=Hello%2C%20I%27m%20interested%20in%20your%20research%20services" target="_blank" rel="noopener noreferrer">
                 Get Started
               </a>
@@ -106,6 +122,21 @@ const Header = () => {
                   </a>
                 )
               ))}
+              {user ? (
+                <Button variant="outline" className="mt-2" asChild>
+                  <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                    My Dashboard
+                  </Link>
+                </Button>
+              ) : (
+                <Button variant="outline" className="mt-2" asChild>
+                  <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Client Login
+                  </Link>
+                </Button>
+              )}
               <Button variant="gold" size="lg" className="mt-2" asChild>
                 <a href="https://wa.me/2349022282963?text=Hello%2C%20I%27m%20interested%20in%20your%20research%20services" target="_blank" rel="noopener noreferrer">
                   Get Started
