@@ -67,7 +67,7 @@ const Header = () => {
               <Button variant="outline" asChild>
                 <Link to="/auth">
                   <LogIn className="w-4 h-4 mr-2" />
-                  Client Login
+                  Sign In / Sign Up
                 </Link>
               </Button>
             )}
@@ -133,7 +133,7 @@ const Header = () => {
                 <Button variant="outline" className="mt-2" asChild>
                   <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
                     <LogIn className="w-4 h-4 mr-2" />
-                    Client Login
+                    Sign In / Sign Up
                   </Link>
                 </Button>
               )}
