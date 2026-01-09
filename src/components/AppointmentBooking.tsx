@@ -118,20 +118,28 @@ const AppointmentBooking = () => {
     try {
       const meetingLink = generateMeetingLink();
       
-      const { error } = await supabase.from("appointments").insert({
-        client_name: formData.name,
-        client_email: formData.email,
-        client_phone: formData.phone || null,
-        client_timezone: visitorTimezone,
-        appointment_date: selectedDate!.toISOString().split('T')[0],
-        appointment_time: formData.time,
-        appointment_type: formData.type,
-        meeting_link: meetingLink,
-        notes: formData.notes || null,
-        status: "pending",
+      // Use edge function with server-side rate limiting and validation
+      const { data, error } = await supabase.functions.invoke("appointments", {
+        body: {
+          action: "create",
+          client_name: formData.name,
+          client_email: formData.email,
+          client_phone: formData.phone || null,
+          client_timezone: visitorTimezone,
+          appointment_date: selectedDate!.toISOString().split('T')[0],
+          appointment_time: formData.time,
+          appointment_type: formData.type,
+          meeting_link: meetingLink,
+          notes: formData.notes || null,
+        },
       });
 
       if (error) throw error;
+      
+      // Check for rate limit or validation errors from the edge function
+      if (data?.error) {
+        throw new Error(data.error);
+      }
 
       setBookingComplete(true);
       toast({
