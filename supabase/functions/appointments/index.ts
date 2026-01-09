@@ -6,6 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+
 // Rate limiting configuration
 const RATE_LIMITS = {
   APPOINTMENTS_PER_HOUR: 3, // Max appointments per IP per hour
@@ -184,6 +186,65 @@ serve(async (req: Request): Promise<Response> => {
       }
 
       console.log(`Appointment created successfully for ${client_email}`);
+
+      // Send confirmation email to client
+      if (RESEND_API_KEY) {
+        try {
+          const appointmentTypeLabels: Record<string, string> = {
+            "consultation": "Free Consultation (30 min)",
+            "project-discussion": "Project Discussion (1 hr)",
+            "thesis-review": "Thesis Review (1 hr)",
+            "data-analysis": "Data Analysis Consultation (45 min)",
+          };
+
+          const formattedDate = new Date(appointment_date).toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+
+          const emailRes = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${RESEND_API_KEY}`,
+            },
+            body: JSON.stringify({
+              from: "ResearchReady <onboarding@resend.dev>",
+              to: [client_email],
+              subject: "Appointment Confirmed - ResearchReady",
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                  <h1 style="color: #2563eb;">Appointment Confirmed!</h1>
+                  <p>Hello ${client_name},</p>
+                  <p>Your appointment has been successfully scheduled. Here are the details:</p>
+                  
+                  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p><strong>Date:</strong> ${formattedDate}</p>
+                    <p><strong>Time:</strong> ${appointment_time} (Nigeria Time - UTC+1)</p>
+                    <p><strong>Type:</strong> ${appointmentTypeLabels[appointment_type] || appointment_type}</p>
+                    <p><strong>Your Timezone:</strong> ${client_timezone}</p>
+                    ${meeting_link ? `<p><strong>Meeting Link:</strong> <a href="${meeting_link}">${meeting_link}</a></p>` : ''}
+                  </div>
+                  
+                  <p>Please make sure to join the meeting a few minutes early. If you need to reschedule, please contact us.</p>
+                  
+                  <p>Best regards,<br>The ResearchReady Team</p>
+                </div>
+              `,
+            }),
+          });
+
+          const emailResult = await emailRes.json();
+          console.log(`Confirmation email sent to ${client_email}:`, emailResult);
+        } catch (emailError) {
+          console.error("Failed to send confirmation email:", emailError);
+          // Don't fail the appointment creation if email fails
+        }
+      } else {
+        console.log("RESEND_API_KEY not configured, skipping email");
+      }
 
       return new Response(
         JSON.stringify({ success: true, appointment: { id: data.id } }),
