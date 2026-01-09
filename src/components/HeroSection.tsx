@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowRight, CheckCircle, UserPlus } from "lucide-react";
+import { Link } from "react-router-dom";
 import ProjectRequestForm from "@/components/ProjectRequestForm";
 
 const HeroSection = () => {
@@ -56,6 +57,14 @@ const HeroSection = () => {
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </a>
               </Button>
+              <Button variant="outline" size="xl" className="group" asChild>
+                <Link to="/auth">
+                  <UserPlus className="h-5 w-5 mr-2" />
+                  Create Free Account
+                </Link>
+              </Button>
+            </div>
+            <div className="opacity-0 animate-fade-in" style={{ animationDelay: "0.6s" }}>
               <ProjectRequestForm />
             </div>
 
