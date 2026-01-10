@@ -12,6 +12,7 @@ import { Mail, Lock, User, ArrowLeft, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 import { Separator } from "@/components/ui/separator";
+import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -389,6 +390,7 @@ const ClientAuth = () => {
                     onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
                     className={errors.password ? "border-destructive" : ""}
                   />
+                  <PasswordStrengthIndicator password={signupData.password} />
                   {errors.password && <p className="text-sm text-destructive mt-1">{errors.password}</p>}
                 </div>
 
