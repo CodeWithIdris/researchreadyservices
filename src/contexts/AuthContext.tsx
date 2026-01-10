@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string) => {
     const redirectUrl = `${window.location.origin}/dashboard`;
     
-    const { error } = await supabase.auth.signUp({
+    const { error, data } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -51,6 +51,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       },
     });
+
+    // Send welcome email on successful signup
+    if (!error && data.user) {
+      supabase.functions.invoke('send-welcome-email', {
+        body: { email, fullName }
+      }).catch(err => console.error('Welcome email error:', err));
+    }
+
     return { error };
   };
 
