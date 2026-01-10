@@ -34,6 +34,9 @@ const ClientAuth = () => {
   const { user, loading, signIn, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isResetLoading, setIsResetLoading] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   
   const [loginData, setLoginData] = useState({ email: "", password: "" });
@@ -43,6 +46,38 @@ const ClientAuth = () => {
     password: "",
     confirmPassword: "",
   });
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail || !z.string().email().safeParse(resetEmail).success) {
+      setErrors({ resetEmail: "Please enter a valid email" });
+      return;
+    }
+    
+    setIsResetLoading(true);
+    setErrors({});
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+    
+    setIsResetLoading(false);
+    
+    if (error) {
+      toast({
+        title: "Reset Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Reset Email Sent",
+        description: "Check your inbox for a password reset link.",
+      });
+      setShowResetForm(false);
+      setResetEmail("");
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
@@ -250,7 +285,61 @@ const ClientAuth = () => {
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Logging in..." : "Login"}
                 </Button>
+
+                <Button
+                  type="button"
+                  variant="link"
+                  className="w-full text-sm"
+                  onClick={() => setShowResetForm(true)}
+                >
+                  Forgot your password?
+                </Button>
               </form>
+
+              {/* Password Reset Modal */}
+              {showResetForm && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                  <Card className="w-full max-w-md p-6">
+                    <h2 className="font-playfair text-xl font-bold mb-4">Reset Password</h2>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      Enter your email and we'll send you a reset link.
+                    </p>
+                    <form onSubmit={handlePasswordReset} className="space-y-4">
+                      <div>
+                        <Label htmlFor="reset-email">Email</Label>
+                        <Input
+                          id="reset-email"
+                          type="email"
+                          placeholder="your@email.com"
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                          className={errors.resetEmail ? "border-destructive" : ""}
+                        />
+                        {errors.resetEmail && (
+                          <p className="text-sm text-destructive mt-1">{errors.resetEmail}</p>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => {
+                            setShowResetForm(false);
+                            setResetEmail("");
+                            setErrors({});
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button type="submit" className="flex-1" disabled={isResetLoading}>
+                          {isResetLoading ? "Sending..." : "Send Reset Link"}
+                        </Button>
+                      </div>
+                    </form>
+                  </Card>
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="signup">
