@@ -11,10 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import ProfileSection from "@/components/ProfileSection";
 import { 
   LayoutDashboard, FolderOpen, Clock, CheckCircle, 
   AlertCircle, DollarSign, Calendar, User, LogOut,
-  FileText, MessageSquare, RefreshCw
+  FileText, MessageSquare, RefreshCw, Settings
 } from "lucide-react";
 
 interface Project {
@@ -46,6 +47,7 @@ interface Profile {
   id: string;
   full_name: string | null;
   phone: string | null;
+  created_at?: string;
 }
 
 const statusColors: Record<string, string> = {
@@ -271,10 +273,14 @@ const ClientDashboard = () => {
               <Button onClick={() => navigate("/book")}>Book a Consultation</Button>
             </Card>
           ) : (
-            <Tabs defaultValue="projects" className="space-y-6">
-              <TabsList>
-                <TabsTrigger value="projects" className="flex items-center gap-2">
+            <Tabs defaultValue="overview" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="overview" className="flex items-center gap-2">
                   <LayoutDashboard className="w-4 h-4" />
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="projects" className="flex items-center gap-2">
+                  <FolderOpen className="w-4 h-4" />
                   Projects
                 </TabsTrigger>
                 <TabsTrigger value="updates" className="flex items-center gap-2">
@@ -282,6 +288,95 @@ const ClientDashboard = () => {
                   Updates ({updates.length})
                 </TabsTrigger>
               </TabsList>
+
+              <TabsContent value="overview" className="space-y-6">
+                {/* Profile Section */}
+                <ProfileSection 
+                  profile={profile} 
+                  email={user?.email || ""} 
+                  onProfileUpdate={fetchData}
+                />
+
+                {/* Quick Actions */}
+                <div className="grid md:grid-cols-3 gap-4">
+                  <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer group" onClick={() => navigate("/book")}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-accent/20 rounded-xl flex items-center justify-center group-hover:bg-accent/30 transition-colors">
+                        <Calendar className="w-6 h-6 text-accent" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground">Book Consultation</h3>
+                        <p className="text-xs text-muted-foreground">Schedule a meeting</p>
+                      </div>
+                    </div>
+                  </Card>
+                  <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer group">
+                    <a 
+                      href="https://wa.me/2349022282963?text=Hi, I need support with my project"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3"
+                    >
+                      <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
+                        <MessageSquare className="w-6 h-6 text-green-500" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground">Get Support</h3>
+                        <p className="text-xs text-muted-foreground">Chat on WhatsApp</p>
+                      </div>
+                    </a>
+                  </Card>
+                  <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer group" onClick={() => navigate("/support")}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center group-hover:bg-primary/30 transition-colors">
+                        <Settings className="w-6 h-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground">Help Center</h3>
+                        <p className="text-xs text-muted-foreground">FAQs & support</p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Recent Projects Preview */}
+                {projects.length > 0 && (
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold text-foreground">Recent Projects</h3>
+                      <Button variant="link" size="sm" onClick={() => document.querySelector('[data-state="inactive"][value="projects"]')?.dispatchEvent(new MouseEvent('click'))}>
+                        View All
+                      </Button>
+                    </div>
+                    <div className="space-y-3">
+                      {projects.slice(0, 2).map((project) => (
+                        <Card key={project.id} className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                <FileText className="w-5 h-5 text-primary" />
+                              </div>
+                              <div>
+                                <h4 className="font-medium text-foreground">{project.title}</h4>
+                                <p className="text-xs text-muted-foreground capitalize">{project.project_type}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="text-right hidden sm:block">
+                                <p className="text-sm font-medium">{project.progress}%</p>
+                                <Progress value={project.progress} className="w-20 h-1.5" />
+                              </div>
+                              <Badge className={statusColors[project.status] || "bg-secondary"}>
+                                {project.status.replace("_", " ")}
+                              </Badge>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
 
               <TabsContent value="projects" className="space-y-4">
                 {projects.map((project) => (
