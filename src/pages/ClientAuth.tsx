@@ -187,19 +187,26 @@ const ClientAuth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-20 right-20 w-72 h-72 bg-accent/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 left-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      
+      <div className="w-full max-w-md relative z-10">
+        <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-8 transition-colors group">
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Back to Home
         </Link>
 
-        <Card className="p-8">
+        <Card className="p-8 shadow-xl border-border/50 backdrop-blur-sm">
           <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <User className="w-8 h-8 text-primary" />
+            </div>
             <h1 className="font-playfair text-2xl font-bold text-foreground mb-2">
               Client Portal
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Track your research projects and communicate with experts
             </p>
           </div>
@@ -413,9 +420,30 @@ const ClientAuth = () => {
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Creating account..." : "Create Account"}
                 </Button>
+                
+                <p className="text-xs text-center text-muted-foreground">
+                  By creating an account, you agree to our{" "}
+                  <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
+                  {" "}and{" "}
+                  <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                </p>
               </form>
             </TabsContent>
           </Tabs>
+          
+          {/* Trust indicators */}
+          <div className="mt-8 pt-6 border-t border-border">
+            <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Lock className="w-3 h-3" />
+                <span>Secure Login</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Mail className="w-3 h-3" />
+                <span>Email Support</span>
+              </div>
+            </div>
+          </div>
         </Card>
       </div>
     </div>
