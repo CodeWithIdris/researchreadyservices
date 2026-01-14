@@ -326,14 +326,14 @@ const ClientDashboard = () => {
                       </div>
                     </a>
                   </Card>
-                  <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer group" onClick={() => navigate("/support")}>
+                  <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer group" onClick={() => navigate("/settings")}>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center group-hover:bg-primary/30 transition-colors">
                         <Settings className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground">Help Center</h3>
-                        <p className="text-xs text-muted-foreground">FAQs & support</p>
+                        <h3 className="font-semibold text-foreground">Settings</h3>
+                        <p className="text-xs text-muted-foreground">Profile & preferences</p>
                       </div>
                     </div>
                   </Card>

@@ -18,6 +18,7 @@ import WordChallenge from "./pages/WordChallenge";
 import BookAppointment from "./pages/BookAppointment";
 import ClientAuth from "./pages/ClientAuth";
 import ClientDashboard from "./pages/ClientDashboard";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/book" element={<BookAppointment />} />
             <Route path="/auth" element={<ClientAuth />} />
             <Route path="/dashboard" element={<ClientDashboard />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/game" element={<WordChallenge />} />
             <Route path="/admin" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
