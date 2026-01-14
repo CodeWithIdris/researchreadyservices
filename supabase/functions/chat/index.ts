@@ -10,9 +10,14 @@ const corsHeaders = {
 async function sendAdminNotification(type: string, data: any) {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const response = await fetch(`${supabaseUrl}/functions/v1/send-notification`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "apikey": supabaseAnonKey,
+        "Authorization": `Bearer ${supabaseAnonKey}`
+      },
       body: JSON.stringify({ type, data }),
     });
     if (!response.ok) {

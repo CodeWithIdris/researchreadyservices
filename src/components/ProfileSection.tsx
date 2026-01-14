@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Mail, Phone, Edit2, Save, X, Shield, Calendar } from "lucide-react";
@@ -13,6 +13,7 @@ interface Profile {
   id: string;
   full_name: string | null;
   phone: string | null;
+  avatar_url?: string | null;
   created_at?: string;
 }
 
@@ -86,6 +87,7 @@ const ProfileSection = ({ profile, email, onProfileUpdate }: ProfileSectionProps
         {/* Avatar Section */}
         <div className="flex flex-col items-center gap-3">
           <Avatar className="w-24 h-24 border-4 border-primary/20">
+            <AvatarImage src={profile?.avatar_url || undefined} />
             <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
               {getInitials(profile?.full_name, email)}
             </AvatarFallback>
