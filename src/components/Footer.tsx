@@ -3,30 +3,25 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const phoneNumber = "2349022282963";
-
-  const getServiceWhatsAppLink = (serviceName: string) => {
-    const message = encodeURIComponent(`Hello, I need support with ${serviceName}. Please provide more information.`);
-    return `https://wa.me/${phoneNumber}?text=${message}`;
-  };
 
   const links = {
     services: [
-      { name: "Dissertation Writing", href: getServiceWhatsAppLink("Dissertation Writing"), external: true },
-      { name: "Literature Reviews", href: getServiceWhatsAppLink("Literature Reviews"), external: true },
-      { name: "Thesis Editing", href: getServiceWhatsAppLink("Thesis Editing"), external: true },
-      { name: "Research Analysis", href: getServiceWhatsAppLink("Research Analysis"), external: true },
+      { name: "Dissertation & Thesis Writing", href: "/work-with-us" },
+      { name: "Literature Reviews", href: "/work-with-us" },
+      { name: "Data Analysis", href: "/work-with-us" },
+      { name: "Business Research", href: "/work-with-us" },
     ],
     company: [
-      { name: "About Us", href: "/about", external: false },
-      { name: "Contact", href: "/#contact", external: false },
+      { name: "About Us", href: "/about" },
+      { name: "Work With Us", href: "/work-with-us" },
+      { name: "Book Consultation", href: "/book" },
     ],
     support: [
-      { name: "Support", href: "/support", external: false },
-      { name: "FAQs", href: "/faqs", external: false },
-      { name: "Terms of Service", href: "/terms", external: false },
-      { name: "Privacy Policy", href: "/privacy", external: false },
-      { name: "Refund Policy", href: "/refund", external: false },
+      { name: "Support", href: "/support" },
+      { name: "FAQs", href: "/faqs" },
+      { name: "Terms of Service", href: "/terms" },
+      { name: "Privacy Policy", href: "/privacy" },
+      { name: "Refund Policy", href: "/refund" },
     ],
   };
 
@@ -48,14 +43,15 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-primary-foreground/70 mb-6 max-w-sm">
-              Empowering researchers worldwide with professional academic writing 
-              and research support services since 2014.
+              Premium research and consulting services for professionals and businesses worldwide since 2014.
             </p>
             <div className="flex gap-4">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={social.label}
                   className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors"
                 >
@@ -71,14 +67,12 @@ const Footer = () => {
             <ul className="space-y-3">
               {links.services.map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
-                    target={link.external ? "_blank" : undefined}
-                    rel={link.external ? "noopener noreferrer" : undefined}
+                  <Link
+                    to={link.href}
                     className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -119,13 +113,12 @@ const Footer = () => {
           </nav>
         </div>
 
-        {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-primary-foreground/60 text-sm">
             © {currentYear} ResearchReady Services. All rights reserved.
           </p>
           <p className="text-primary-foreground/60 text-sm">
-            Designed with excellence in mind.
+            Premium research & consulting for serious clients.
           </p>
         </div>
       </div>

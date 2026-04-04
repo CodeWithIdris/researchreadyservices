@@ -1,4 +1,4 @@
-import { Shield, Clock, Users, Award, MessageCircle, RefreshCw } from "lucide-react";
+import { Shield, Clock, Users, Award, Globe, RefreshCw } from "lucide-react";
 
 const features = [
   {
@@ -13,23 +13,23 @@ const features = [
   },
   {
     icon: Users,
-    title: "Expert Writers",
-    description: "PhD-qualified writers with expertise across all academic disciplines.",
+    title: "Expert Researchers",
+    description: "PhD-qualified researchers with expertise across disciplines and industries.",
   },
   {
     icon: Award,
-    title: "Quality Assured",
-    description: "Multi-level quality control ensures the highest academic standards.",
+    title: "Publication-Grade Quality",
+    description: "Multi-level quality control ensures the highest professional standards.",
   },
   {
-    icon: MessageCircle,
-    title: "24/7 Support",
-    description: "Round-the-clock assistance for all your queries and concerns.",
+    icon: Globe,
+    title: "International Reach",
+    description: "Serving professionals in 30+ countries with confidential, premium service.",
   },
   {
     icon: RefreshCw,
-    title: "Free Revisions",
-    description: "Unlimited revisions until you're completely satisfied with the result.",
+    title: "Revisions Included",
+    description: "Revisions until you're completely satisfied with the final deliverable.",
   },
 ];
 
@@ -38,40 +38,37 @@ const WhyUsSection = () => {
     <section id="why-us" className="py-20 lg:py-32 bg-background">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Content Side */}
           <div className="space-y-8">
             <div>
               <span className="inline-block px-4 py-2 bg-accent/10 text-accent font-semibold rounded-full text-sm mb-6">
                 Why Choose Us
               </span>
               <h2 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
-                Your Success Is Our Priority
+                Trusted by Professionals Worldwide
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                We combine academic expertise with personalized service to deliver research that 
-                exceeds expectations. Our commitment to excellence has made us the trusted choice 
-                for thousands of scholars worldwide.
+                We combine deep research expertise with professional service to deliver results that 
+                exceed expectations. Our commitment to excellence has made us the trusted partner 
+                for professionals and organizations across 30+ countries.
               </p>
             </div>
 
-            {/* Stats */}
             <div className="grid grid-cols-3 gap-4 py-8 border-y border-border">
               <div className="text-center">
                 <p className="text-3xl lg:text-4xl font-bold font-playfair text-primary">10+</p>
                 <p className="text-sm text-muted-foreground mt-1">Years Experience</p>
               </div>
               <div className="text-center">
-                <p className="text-3xl lg:text-4xl font-bold font-playfair text-primary">50+</p>
-                <p className="text-sm text-muted-foreground mt-1">Disciplines</p>
+                <p className="text-3xl lg:text-4xl font-bold font-playfair text-primary">30+</p>
+                <p className="text-sm text-muted-foreground mt-1">Countries Served</p>
               </div>
               <div className="text-center">
-                <p className="text-3xl lg:text-4xl font-bold font-playfair text-primary">A+</p>
-                <p className="text-sm text-muted-foreground mt-1">Average Grade</p>
+                <p className="text-3xl lg:text-4xl font-bold font-playfair text-primary">98%</p>
+                <p className="text-sm text-muted-foreground mt-1">Satisfaction Rate</p>
               </div>
             </div>
           </div>
 
-          {/* Features Grid */}
           <div className="grid sm:grid-cols-2 gap-6">
             {features.map((feature, index) => (
               <div

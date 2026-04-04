@@ -16,6 +16,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import WordChallenge from "./pages/WordChallenge";
 import BookAppointment from "./pages/BookAppointment";
+import WorkWithUs from "./pages/WorkWithUs";
 import ClientAuth from "./pages/ClientAuth";
 import ClientDashboard from "./pages/ClientDashboard";
 import Settings from "./pages/Settings";
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/refund" element={<RefundPolicy />} />
             <Route path="/support" element={<Support />} />
             <Route path="/book" element={<BookAppointment />} />
+            <Route path="/work-with-us" element={<WorkWithUs />} />
             <Route path="/auth" element={<ClientAuth />} />
             <Route path="/dashboard" element={<ClientDashboard />} />
             <Route path="/settings" element={<Settings />} />

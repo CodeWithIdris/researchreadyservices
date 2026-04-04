@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Gamepad2, CalendarDays, LayoutDashboard, LogIn } from "lucide-react";
+import { Menu, X, CalendarDays, LayoutDashboard, LogIn, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -12,7 +12,6 @@ const Header = () => {
     { name: "About", href: "/about" },
     { name: "Services", href: "/#services" },
     { name: "Book Consultation", href: "/book", icon: CalendarDays },
-    { name: "Word Game", href: "/game", highlight: true, icon: Gamepad2 },
   ];
 
   return (
@@ -33,11 +32,7 @@ const Header = () => {
                 <Link
                   key={link.name}
                   to={link.href}
-                  className={`transition-colors duration-200 font-medium flex items-center gap-1 ${
-                    link.highlight 
-                      ? "text-accent hover:text-accent/80" 
-                      : "text-muted-foreground hover:text-primary"
-                  }`}
+                  className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium flex items-center gap-1"
                 >
                   {link.icon && <link.icon className="w-4 h-4" />}
                   {link.name}
@@ -67,14 +62,15 @@ const Header = () => {
               <Button variant="outline" asChild>
                 <Link to="/auth">
                   <LogIn className="w-4 h-4 mr-2" />
-                  Sign In / Sign Up
+                  Client Portal
                 </Link>
               </Button>
             )}
             <Button variant="gold" asChild>
-              <a href="https://wa.me/2349022282963?text=Hello%2C%20I%27m%20interested%20in%20your%20research%20services" target="_blank" rel="noopener noreferrer">
-                Get Started
-              </a>
+              <Link to="/work-with-us">
+                Apply for a Project
+                <ArrowRight className="w-4 h-4 ml-1" />
+              </Link>
             </Button>
           </div>
 
@@ -101,11 +97,7 @@ const Header = () => {
                   <Link
                     key={link.name}
                     to={link.href}
-                    className={`transition-colors duration-200 font-medium py-2 flex items-center gap-2 ${
-                      link.highlight 
-                        ? "text-accent hover:text-accent/80" 
-                        : "text-muted-foreground hover:text-primary"
-                    }`}
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium py-2 flex items-center gap-2"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {link.icon && <link.icon className="w-4 h-4" />}
@@ -133,14 +125,15 @@ const Header = () => {
                 <Button variant="outline" className="mt-2" asChild>
                   <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
                     <LogIn className="w-4 h-4 mr-2" />
-                    Sign In / Sign Up
+                    Client Portal
                   </Link>
                 </Button>
               )}
               <Button variant="gold" size="lg" className="mt-2" asChild>
-                <a href="https://wa.me/2349022282963?text=Hello%2C%20I%27m%20interested%20in%20your%20research%20services" target="_blank" rel="noopener noreferrer">
-                  Get Started
-                </a>
+                <Link to="/work-with-us" onClick={() => setIsMenuOpen(false)}>
+                  Apply for a Project
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
               </Button>
             </div>
           </nav>
