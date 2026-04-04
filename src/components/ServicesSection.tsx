@@ -1,69 +1,61 @@
-import { FileText, BookOpen, PenTool, Search, GraduationCap, LineChart } from "lucide-react";
+import { FileText, BookOpen, PenTool, Search, Briefcase, LineChart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const services = [
   {
     icon: FileText,
-    title: "Dissertation Writing",
-    description: "Comprehensive dissertation support from proposal to final defense preparation.",
+    title: "Dissertation & Thesis Writing",
+    description: "Comprehensive support from proposal development to final submission, meeting rigorous academic standards.",
   },
   {
     icon: BookOpen,
     title: "Literature Reviews",
-    description: "Thorough analysis and synthesis of existing research in your field of study.",
+    description: "Thorough analysis and synthesis of existing research, delivering publication-ready reviews.",
   },
   {
     icon: PenTool,
-    title: "Thesis Editing",
-    description: "Professional editing and proofreading to polish your academic work to perfection.",
+    title: "Research Editing & Proofreading",
+    description: "Professional editing to refine your academic and business documents to the highest standard.",
   },
   {
     icon: Search,
-    title: "Research Analysis",
-    description: "Expert data analysis and interpretation using advanced statistical methods.",
+    title: "Data Analysis & Interpretation",
+    description: "Expert quantitative and qualitative analysis using advanced statistical and research methods.",
   },
   {
-    icon: GraduationCap,
-    title: "Academic Coaching",
-    description: "One-on-one guidance to develop your research and writing skills.",
+    icon: Briefcase,
+    title: "Business Research & Strategy",
+    description: "Market research, feasibility studies, and strategic reports for organizations and entrepreneurs.",
   },
   {
     icon: LineChart,
-    title: "Publication Support",
-    description: "Navigate the peer review process and get your research published.",
+    title: "Publication & Advisory Support",
+    description: "Navigate peer review, journal selection, and publication strategy with expert guidance.",
   },
 ];
 
 const ServicesSection = () => {
-  const phoneNumber = "2349022282963";
-
-  const handleServiceClick = (serviceTitle: string) => {
-    const message = encodeURIComponent(`Hello, I need support with ${serviceTitle}. Please provide more information about this service.`);
-    window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
-  };
-
   return (
     <section id="services" className="py-20 lg:py-32 bg-secondary/30">
       <div className="container mx-auto px-4 lg:px-8">
-        {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-20">
           <span className="inline-block px-4 py-2 bg-accent/10 text-accent font-semibold rounded-full text-sm mb-6">
             Our Services
           </span>
           <h2 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            Comprehensive Research Support
+            Premium Research & Consulting Solutions
           </h2>
           <p className="text-lg text-muted-foreground">
-            From initial concept to final publication, we provide expert guidance at every stage of your academic journey.
+            From strategic research to expert analysis, we provide end-to-end support for professionals and organizations globally.
           </p>
         </div>
 
-        {/* Services Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {services.map((service, index) => (
-            <button
+            <Link
               key={service.title}
-              onClick={() => handleServiceClick(service.title)}
-              className="group bg-card rounded-xl p-6 lg:p-8 shadow-sm border border-border hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in text-left cursor-pointer"
+              to="/work-with-us"
+              className="group bg-card rounded-xl p-6 lg:p-8 shadow-sm border border-border hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in text-left block"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-accent/20 transition-colors">
@@ -76,9 +68,9 @@ const ServicesSection = () => {
                 {service.description}
               </p>
               <span className="inline-block mt-4 text-accent font-semibold text-sm group-hover:underline">
-                Get Support →
+                Apply Now →
               </span>
-            </button>
+            </Link>
           ))}
         </div>
       </div>

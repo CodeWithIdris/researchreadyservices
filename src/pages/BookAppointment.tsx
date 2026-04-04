@@ -4,14 +4,14 @@ import SEOHead from "@/components/SEOHead";
 import AppointmentBooking from "@/components/AppointmentBooking";
 import TimezoneDisplay from "@/components/TimezoneDisplay";
 import CurrencyDisplay from "@/components/CurrencyDisplay";
-import WhatsAppButton from "@/components/WhatsAppButton";
+import { Clock, Shield } from "lucide-react";
 
 const BookAppointment = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead 
-        title="Book a Consultation - ResearchReady"
-        description="Schedule a free consultation with our research experts. Get personalized advice for your thesis, dissertation, or research project."
+        title="Book a Strategy Consultation - ResearchReady"
+        description="Schedule a strategy consultation with our research experts. Get personalized advice for your research, business, or consulting project."
       />
       <Header />
       <main className="pt-24 pb-16">
@@ -21,12 +21,24 @@ const BookAppointment = () => {
               Schedule a Meeting
             </span>
             <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-              Book Your Free Consultation
+              Book a Paid Strategy Consultation
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Connect with our research experts via video call. Discuss your project, get personalized advice, 
-              and learn how we can help you succeed.
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
+              This session is for serious clients seeking high-quality research support. 
+              Connect with our experts to discuss your project and receive a tailored strategy.
             </p>
+            
+            {/* Filters */}
+            <div className="flex flex-wrap justify-center gap-4 mt-6">
+              <div className="inline-flex items-center gap-2 bg-accent/10 px-4 py-2 rounded-full">
+                <Shield className="w-4 h-4 text-accent" />
+                <span className="text-sm font-medium text-foreground">Minimum project budget: $100</span>
+              </div>
+              <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full">
+                <Clock className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium text-foreground">Limited consultation slots available weekly</span>
+              </div>
+            </div>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -45,23 +57,23 @@ const BookAppointment = () => {
                 <ul className="space-y-3 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-primary">✓</span>
-                    Free 30-minute initial consultation
+                    One-on-one session with a senior research expert
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">✓</span>
-                    One-on-one session with a research expert
+                    Detailed project assessment and strategy
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">✓</span>
-                    Video call link sent via email
+                    Video call link sent via email confirmation
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">✓</span>
-                    No obligation to proceed
+                    Custom quote and timeline for your project
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">✓</span>
-                    Get a custom quote for your project
+                    Confidential and professional discussion
                   </li>
                 </ul>
               </div>
@@ -70,7 +82,6 @@ const BookAppointment = () => {
         </div>
       </main>
       <Footer />
-      <WhatsAppButton />
     </div>
   );
 };
