@@ -16,6 +16,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import WordChallenge from "./pages/WordChallenge";
 import BookAppointment from "./pages/BookAppointment";
+import WorkWithUs from "./pages/WorkWithUs";
 import ClientAuth from "./pages/ClientAuth";
 import ClientDashboard from "./pages/ClientDashboard";
 import Settings from "./pages/Settings";
