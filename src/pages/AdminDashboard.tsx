@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Loader2, LogOut, MessageSquare, Ticket, Mail, Users, 
-  Calendar, Clock, RefreshCw, Eye, Bell 
+  Calendar, Clock, RefreshCw, Eye, Bell, Target, Zap, Filter
 } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
 
@@ -52,31 +52,45 @@ interface Message {
   created_at: string;
 }
 
+interface ProjectLead {
+  id: string;
+  name: string;
+  email: string;
+  country: string;
+  budget_range: string;
+  project_type: string;
+  deadline: string;
+  description: string;
+  priority: string;
+  status: string;
+  source: string;
+  fast_response: boolean;
+  created_at: string;
+}
+
 const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [leads, setLeads] = useState<ProjectLead[]>([]);
+  const [leadFilter, setLeadFilter] = useState<string>("all");
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const [sessionMessages, setSessionMessages] = useState<Message[]>([]);
   const [isMessagesLoading, setIsMessagesLoading] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<ProjectLead | null>(null);
   const [newActivityCount, setNewActivityCount] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Real-time subscription setup
   const setupRealtimeSubscriptions = useCallback(() => {
-    console.log("Setting up real-time subscriptions...");
-    
-    // Subscribe to new chat sessions
     const sessionsChannel = supabase
       .channel('admin-sessions')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'chat_sessions' },
         (payload) => {
-          console.log("New chat session:", payload.new);
           const newSession = payload.new as ChatSession;
           newSession.chat_messages = [{ count: 0 }];
           setSessions(prev => [newSession, ...prev]);
@@ -89,14 +103,12 @@ const AdminDashboard = () => {
       )
       .subscribe();
 
-    // Subscribe to new tickets
     const ticketsChannel = supabase
       .channel('admin-tickets')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'support_tickets' },
         (payload) => {
-          console.log("New ticket:", payload.new);
           const newTicket = payload.new as SupportTicket;
           setTickets(prev => [newTicket, ...prev]);
           setNewActivityCount(prev => prev + 1);
@@ -111,24 +123,19 @@ const AdminDashboard = () => {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'support_tickets' },
         (payload) => {
-          console.log("Ticket updated:", payload.new);
           const updatedTicket = payload.new as SupportTicket;
           setTickets(prev => prev.map(t => t.id === updatedTicket.id ? updatedTicket : t));
         }
       )
       .subscribe();
 
-    // Subscribe to new messages (for updating message counts)
     const messagesChannel = supabase
       .channel('admin-messages')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'chat_messages' },
         (payload) => {
-          console.log("New message:", payload.new);
           const newMessage = payload.new as Message & { session_id: string };
-          
-          // Update message count for the session
           setSessions(prev => prev.map(s => {
             if (s.id === newMessage.session_id) {
               const currentCount = s.chat_messages?.[0]?.count || 0;
@@ -136,11 +143,29 @@ const AdminDashboard = () => {
             }
             return s;
           }));
-
-          // If viewing this session, add the message
           if (selectedSession === newMessage.session_id) {
             setSessionMessages(prev => [...prev, newMessage]);
           }
+        }
+      )
+      .subscribe();
+
+    // Subscribe to new leads
+    const leadsChannel = supabase
+      .channel('admin-leads')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'project_leads' },
+        (payload) => {
+          const newLead = payload.new as ProjectLead;
+          setLeads(prev => [newLead, ...prev]);
+          setNewActivityCount(prev => prev + 1);
+          const emoji = newLead.priority === 'high' ? '🔥' : newLead.priority === 'medium' ? '📋' : '📝';
+          toast({
+            title: `${emoji} New Lead: ${newLead.name}`,
+            description: `${newLead.budget_range} • ${newLead.country} • ${newLead.priority.toUpperCase()} priority`,
+            variant: newLead.priority === 'high' ? 'default' : undefined,
+          });
         }
       )
       .subscribe();
@@ -149,6 +174,7 @@ const AdminDashboard = () => {
       supabase.removeChannel(sessionsChannel);
       supabase.removeChannel(ticketsChannel);
       supabase.removeChannel(messagesChannel);
+      supabase.removeChannel(leadsChannel);
     };
   }, [selectedSession, toast]);
 
@@ -171,7 +197,6 @@ const AdminDashboard = () => {
       return;
     }
     
-    // Verify user is in admin_users table (defense in depth)
     const { data: adminUser, error: adminError } = await supabase
       .from('admin_users')
       .select('id')
@@ -192,7 +217,6 @@ const AdminDashboard = () => {
     loadData();
   };
 
-  // Setup realtime subscriptions after authentication
   useEffect(() => {
     if (!isLoading && sessions.length >= 0) {
       const cleanup = setupRealtimeSubscriptions();
@@ -203,6 +227,7 @@ const AdminDashboard = () => {
   const loadData = async () => {
     setIsRefreshing(true);
     try {
+      // Load chat/ticket/subscriber data
       const { data, error } = await supabase.functions.invoke("chat", {
         body: { action: "get_admin_data" },
       });
@@ -212,6 +237,16 @@ const AdminDashboard = () => {
       setSessions(data.sessions || []);
       setTickets(data.tickets || []);
       setSubscribers(data.subscribers || []);
+
+      // Load leads directly
+      const { data: leadsData, error: leadsError } = await supabase
+        .from('project_leads')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!leadsError && leadsData) {
+        setLeads(leadsData as ProjectLead[]);
+      }
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
@@ -279,6 +314,22 @@ const AdminDashboard = () => {
     }
   };
 
+  const updateLeadStatus = async (leadId: string, status: string) => {
+    try {
+      const { error } = await supabase
+        .from('project_leads')
+        .update({ status })
+        .eq('id', leadId);
+
+      if (error) throw error;
+
+      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status } : l));
+      toast({ title: "Lead status updated" });
+    } catch {
+      toast({ title: "Error", description: "Failed to update lead.", variant: "destructive" });
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
   };
@@ -292,7 +343,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getTicketPriorityColor = (priority: string) => {
     switch (priority) {
       case "high": return "destructive";
       case "normal": return "default";
@@ -300,6 +351,30 @@ const AdminDashboard = () => {
       default: return "outline";
     }
   };
+
+  const getLeadPriorityStyles = (priority: string) => {
+    switch (priority) {
+      case "high": return "border-l-4 border-l-green-500 bg-green-50/50 dark:bg-green-950/20";
+      case "medium": return "border-l-4 border-l-orange-500 bg-orange-50/50 dark:bg-orange-950/20";
+      case "low": return "border-l-4 border-l-red-500 bg-red-50/50 dark:bg-red-950/20";
+      default: return "";
+    }
+  };
+
+  const getLeadPriorityBadge = (priority: string) => {
+    switch (priority) {
+      case "high": return <Badge className="bg-green-600 hover:bg-green-700 text-white">HIGH</Badge>;
+      case "medium": return <Badge className="bg-orange-500 hover:bg-orange-600 text-white">MEDIUM</Badge>;
+      case "low": return <Badge className="bg-red-500 hover:bg-red-600 text-white">LOW</Badge>;
+      default: return <Badge variant="outline">{priority}</Badge>;
+    }
+  };
+
+  const filteredLeads = leadFilter === "all"
+    ? leads
+    : leads.filter(l => l.priority === leadFilter);
+
+  const highPriorityLeads = leads.filter(l => l.priority === "high");
 
   if (isLoading) {
     return (
@@ -350,7 +425,33 @@ const AdminDashboard = () => {
 
         <main className="container mx-auto px-4 py-6">
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <Target className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{leads.length}</p>
+                    <p className="text-sm text-muted-foreground">Total Leads</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+                    <Zap className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{highPriorityLeads.length}</p>
+                    <p className="text-sm text-muted-foreground">High Priority</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
@@ -382,8 +483,8 @@ const AdminDashboard = () => {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-green-600" />
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Mail className="w-6 h-6 text-purple-600" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{subscribers.length}</p>
@@ -392,24 +493,20 @@ const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Users className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{tickets.length}</p>
-                    <p className="text-sm text-muted-foreground">Total Tickets</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Tabs */}
-          <Tabs defaultValue="sessions" className="space-y-4">
+          <Tabs defaultValue="leads" className="space-y-4">
             <TabsList>
+              <TabsTrigger value="leads" className="gap-2">
+                <Target className="w-4 h-4" />
+                Project Leads
+                {highPriorityLeads.length > 0 && (
+                  <Badge variant="destructive" className="ml-1 text-xs px-1.5 py-0">
+                    {highPriorityLeads.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
               <TabsTrigger value="sessions" className="gap-2">
                 <MessageSquare className="w-4 h-4" />
                 Chat Sessions
@@ -423,6 +520,112 @@ const AdminDashboard = () => {
                 Subscribers
               </TabsTrigger>
             </TabsList>
+
+            {/* Leads Tab */}
+            <TabsContent value="leads">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Project Leads</CardTitle>
+                      <CardDescription>Applications from /work-with-us landing page</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Filter className="w-4 h-4 text-muted-foreground" />
+                      <Select value={leadFilter} onValueChange={setLeadFilter}>
+                        <SelectTrigger className="w-40">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Leads</SelectItem>
+                          <SelectItem value="high">High Priority</SelectItem>
+                          <SelectItem value="medium">Medium Priority</SelectItem>
+                          <SelectItem value="low">Low Priority</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[500px]">
+                    <div className="space-y-3">
+                      {filteredLeads.length === 0 ? (
+                        <p className="text-center text-muted-foreground py-8">
+                          No leads yet.
+                        </p>
+                      ) : (
+                        filteredLeads.map((lead) => (
+                          <div
+                            key={lead.id}
+                            className={`p-4 rounded-lg transition-colors ${getLeadPriorityStyles(lead.priority)}`}
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                  <span className="font-semibold">{lead.name}</span>
+                                  {getLeadPriorityBadge(lead.priority)}
+                                  {lead.fast_response && (
+                                    <Badge variant="outline" className="text-xs border-amber-500 text-amber-600">
+                                      <Zap className="w-3 h-3 mr-1" />
+                                      Fast Response
+                                    </Badge>
+                                  )}
+                                  <Badge variant="outline" className="text-xs">
+                                    {lead.source}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                  {lead.email} • {lead.country}
+                                </p>
+                                <div className="flex items-center gap-3 mt-1 text-sm">
+                                  <span className="font-medium">{lead.budget_range}</span>
+                                  <span className="text-muted-foreground">•</span>
+                                  <span className="text-muted-foreground">{lead.project_type}</span>
+                                  <span className="text-muted-foreground">•</span>
+                                  <span className="text-muted-foreground">{lead.deadline}</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Select
+                                  value={lead.status}
+                                  onValueChange={(v) => updateLeadStatus(lead.id, v)}
+                                >
+                                  <SelectTrigger className="w-32">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="new">New</SelectItem>
+                                    <SelectItem value="contacted">Contacted</SelectItem>
+                                    <SelectItem value="converted">Converted</SelectItem>
+                                    <SelectItem value="rejected">Rejected</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setSelectedLead(lead)}
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                            <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                              {lead.description}
+                            </p>
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {formatDate(lead.created_at)}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
             {/* Chat Sessions Tab */}
             <TabsContent value="sessions">
@@ -507,7 +710,7 @@ const AdminDashboard = () => {
                                 </p>
                               </div>
                               <div className="flex items-center gap-2">
-                                <Badge variant={getPriorityColor(ticket.priority)}>
+                                <Badge variant={getTicketPriorityColor(ticket.priority)}>
                                   {ticket.priority}
                                 </Badge>
                                 <Select
@@ -622,6 +825,85 @@ const AdminDashboard = () => {
                 </div>
               )}
             </ScrollArea>
+          </DialogContent>
+        </Dialog>
+
+        {/* Lead Detail Dialog */}
+        <Dialog open={!!selectedLead} onOpenChange={() => setSelectedLead(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-3">
+                Lead Details
+                {selectedLead && getLeadPriorityBadge(selectedLead.priority)}
+                {selectedLead?.fast_response && (
+                  <Badge variant="outline" className="border-amber-500 text-amber-600">
+                    <Zap className="w-3 h-3 mr-1" /> Fast Response
+                  </Badge>
+                )}
+              </DialogTitle>
+            </DialogHeader>
+            {selectedLead && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Name</p>
+                    <p className="font-medium">{selectedLead.name}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Email</p>
+                    <p className="font-medium">{selectedLead.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Country</p>
+                    <p className="font-medium">{selectedLead.country}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Budget Range</p>
+                    <p className="font-medium">{selectedLead.budget_range}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Project Type</p>
+                    <p className="font-medium">{selectedLead.project_type}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Deadline</p>
+                    <p className="font-medium">{selectedLead.deadline}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Source</p>
+                    <p className="font-medium capitalize">{selectedLead.source}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Submitted</p>
+                    <p className="font-medium">{formatDate(selectedLead.created_at)}</p>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Project Description</p>
+                  <p className="text-sm bg-muted/50 rounded-lg p-4">{selectedLead.description}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Status:</span>
+                  <Select
+                    value={selectedLead.status}
+                    onValueChange={(v) => {
+                      updateLeadStatus(selectedLead.id, v);
+                      setSelectedLead({ ...selectedLead, status: v });
+                    }}
+                  >
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="new">New</SelectItem>
+                      <SelectItem value="contacted">Contacted</SelectItem>
+                      <SelectItem value="converted">Converted</SelectItem>
+                      <SelectItem value="rejected">Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </div>
