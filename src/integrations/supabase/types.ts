@@ -377,10 +377,12 @@ export type Database = {
           deadline: string
           description: string
           email: string
+          fast_response: boolean | null
           id: string
           name: string
           priority: string
           project_type: string
+          source: string | null
           status: string
           updated_at: string
         }
@@ -391,10 +393,12 @@ export type Database = {
           deadline: string
           description: string
           email: string
+          fast_response?: boolean | null
           id?: string
           name: string
           priority?: string
           project_type: string
+          source?: string | null
           status?: string
           updated_at?: string
         }
@@ -405,10 +409,12 @@ export type Database = {
           deadline?: string
           description?: string
           email?: string
+          fast_response?: boolean | null
           id?: string
           name?: string
           priority?: string
           project_type?: string
+          source?: string | null
           status?: string
           updated_at?: string
         }
