@@ -24,6 +24,7 @@ import {
   Globe,
   Award,
   AlertTriangle,
+  Zap,
 } from "lucide-react";
 
 const applicationSchema = z.object({
@@ -48,14 +49,49 @@ const VAGUE_PATTERNS = [
   /^do\s*my/i,
   /^write\s*my/i,
   /^homework/i,
+  /^please\s*help/i,
+  /^can\s*you\s*help/i,
 ];
 
-function classifyLead(budgetRange: string, description: string): "high" | "medium" | "low" {
-  const isVague = VAGUE_PATTERNS.some((p) => p.test(description.trim()));
+const DELIVERABLE_KEYWORDS = [
+  "report", "analysis", "thesis", "dissertation", "proposal",
+  "literature review", "data", "methodology", "research",
+  "strategy", "publication", "manuscript", "survey", "framework",
+  "findings", "recommendations", "deliverable", "chapters",
+];
+
+function classifyLead(
+  budgetRange: string,
+  description: string
+): "high" | "medium" | "low" {
+  const trimmed = description.trim();
+  const isVague = VAGUE_PATTERNS.some((p) => p.test(trimmed));
   const highBudgets = ["$300 – $700", "$700 – $1,500", "$1,500+"];
-  if (isVague) return "low";
-  if (highBudgets.includes(budgetRange) && description.trim().length >= 50) return "high";
+  const mediumBudgets = ["$150 – $300"];
+  const hasDeliverables = DELIVERABLE_KEYWORDS.some((kw) =>
+    trimmed.toLowerCase().includes(kw)
+  );
+
+  if (isVague || trimmed.length < 50) return "low";
+  if (
+    highBudgets.includes(budgetRange) &&
+    trimmed.length >= 100 &&
+    hasDeliverables
+  )
+    return "high";
+  if (mediumBudgets.includes(budgetRange) && trimmed.length >= 50)
+    return "medium";
+  if (highBudgets.includes(budgetRange)) return "medium";
   return "medium";
+}
+
+function detectSource(): string {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("utm_source") || params.get("fbclid") || params.get("gclid"))
+    return "ads";
+  if (document.referrer && !document.referrer.includes(window.location.hostname))
+    return "referral";
+  return "organic";
 }
 
 const WorkWithUs = () => {
@@ -123,6 +159,8 @@ const WorkWithUs = () => {
 
     setIsSubmitting(true);
     const priority = classifyLead(formData.budgetRange, formData.description);
+    const source = detectSource();
+    const fastResponse = priority === "high";
 
     try {
       const { error } = await supabase.from("project_leads").insert({
@@ -134,11 +172,13 @@ const WorkWithUs = () => {
         deadline: formData.deadline,
         description: formData.description,
         priority,
+        source,
+        fast_response: fastResponse,
       });
 
       if (error) throw error;
 
-      // Fire Meta Pixel Lead event
+      // Fire Meta Pixel Lead event (once per submission)
       if (typeof window !== "undefined" && (window as any).fbq) {
         (window as any).fbq("track", "Lead", {
           content_name: formData.projectType,
@@ -147,17 +187,24 @@ const WorkWithUs = () => {
         });
       }
 
-      if (priority === "low") {
+      // Show response based on priority
+      if (priority === "high") {
         toast({
-          title: "Thank you for your interest",
+          title: "Application Received ✓",
           description:
-            "Due to high demand, we prioritize projects that meet our minimum scope and budget requirements. We'll be in touch if we can assist.",
+            "Your project appears to be a strong fit. Our team will review your requirements and get back to you shortly with next steps.",
+        });
+      } else if (priority === "medium") {
+        toast({
+          title: "Application Received",
+          description:
+            "We will review your request and respond within 24–48 hours if your project aligns with our current availability.",
         });
       } else {
         toast({
-          title: "Application received!",
+          title: "Thank you for your interest",
           description:
-            "Our team will review your project and respond within 24 hours.",
+            "At this time, we prioritize projects with clearly defined scope and objectives. You may resubmit with more detailed information.",
         });
       }
 
@@ -436,12 +483,25 @@ const WorkWithUs = () => {
                   <Label htmlFor="description">Project Description *</Label>
                   <Textarea
                     id="description"
-                    placeholder="Describe your project requirements, research topic, methodology preferences, and expected deliverables..."
+                    placeholder="Describe your project requirements, research topic, methodology preferences, and expected deliverables... (minimum 100 characters recommended for faster review)"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="min-h-[140px]"
                     required
                   />
+                  <p className="text-xs text-muted-foreground text-right">
+                    {formData.description.length} characters
+                    {formData.description.length > 0 && formData.description.length < 100 && (
+                      <span className="text-destructive"> — add more detail for faster review</span>
+                    )}
+                  </p>
+                </div>
+
+                {/* Pre-submit qualification note */}
+                <div className="bg-muted/50 rounded-lg p-3 text-center">
+                  <p className="text-xs text-muted-foreground">
+                    We review applications based on project clarity and budget. Only qualified projects will receive a response.
+                  </p>
                 </div>
 
                 <Button
@@ -455,6 +515,24 @@ const WorkWithUs = () => {
                   {!isSubmitting && <ArrowRight className="w-5 h-5" />}
                 </Button>
               </form>
+
+              {/* Trust signals below form */}
+              <div className="mt-8 pt-6 border-t border-border">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <Lock className="w-4 h-4 text-accent" />
+                    <span>Confidential & professional handling</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <Globe className="w-4 h-4 text-accent" />
+                    <span>Trusted by international clients</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <Zap className="w-4 h-4 text-accent" />
+                    <span>Limited slots available weekly</span>
+                  </div>
+                </div>
+              </div>
 
               <div className="text-center mt-6 space-y-2">
                 <p className="text-sm text-muted-foreground">
