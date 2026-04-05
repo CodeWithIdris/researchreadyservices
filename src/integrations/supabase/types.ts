@@ -369,6 +369,51 @@ export type Database = {
         }
         Relationships: []
       }
+      project_leads: {
+        Row: {
+          budget_range: string
+          country: string
+          created_at: string
+          deadline: string
+          description: string
+          email: string
+          id: string
+          name: string
+          priority: string
+          project_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          budget_range: string
+          country: string
+          created_at?: string
+          deadline: string
+          description: string
+          email: string
+          id?: string
+          name: string
+          priority?: string
+          project_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          budget_range?: string
+          country?: string
+          created_at?: string
+          deadline?: string
+          description?: string
+          email?: string
+          id?: string
+          name?: string
+          priority?: string
+          project_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       project_updates: {
         Row: {
           created_at: string
