@@ -114,7 +114,7 @@ const AboutUs = () => {
           </div>
           <div className="text-center mt-10">
             <Button variant="gold" size="lg" asChild>
-              <Link to="/work-with-us">Apply for a Project</Link>
+              <a href="mailto:researchreadyservices@gmail.com?subject=Project%20Application%20-%20ResearchReady&body=Full%20Name%3A%0ACountry%3A%0AProject%20Type%3A%0ABudget%20Range%3A%0ADeadline%3A%0A%0AProject%20Description%3A%0A%0APlease%20attach%20any%20relevant%20documents.">Apply for a Project</a>
             </Button>
           </div>
         </div>
