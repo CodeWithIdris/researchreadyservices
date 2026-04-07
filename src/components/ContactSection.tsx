@@ -68,10 +68,10 @@ const ContactSection = () => {
               Projects start from $100+.
             </p>
             <Button variant="gold" size="xl" className="group w-full sm:w-auto" asChild>
-              <Link to="/work-with-us">
+              <a href="mailto:researchreadyservices@gmail.com?subject=Project%20Application%20-%20ResearchReady&body=Full%20Name%3A%0ACountry%3A%0AProject%20Type%3A%0ABudget%20Range%3A%0ADeadline%3A%0A%0AProject%20Description%3A%0A%0APlease%20attach%20any%20relevant%20documents.">
                 Apply for a Project
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
+              </a>
             </Button>
             <p className="text-sm text-muted-foreground">For serious clients only</p>
           </div>

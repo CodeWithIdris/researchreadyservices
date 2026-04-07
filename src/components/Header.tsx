@@ -67,10 +67,10 @@ const Header = () => {
               </Button>
             )}
             <Button variant="gold" asChild>
-              <Link to="/work-with-us">
+              <a href="mailto:researchreadyservices@gmail.com?subject=Project%20Application%20-%20ResearchReady&body=Full%20Name%3A%0ACountry%3A%0AProject%20Type%3A%0ABudget%20Range%3A%0ADeadline%3A%0A%0AProject%20Description%3A%0A%0APlease%20attach%20any%20relevant%20documents.">
                 Apply for a Project
                 <ArrowRight className="w-4 h-4 ml-1" />
-              </Link>
+              </a>
             </Button>
           </div>
 
@@ -130,10 +130,10 @@ const Header = () => {
                 </Button>
               )}
               <Button variant="gold" size="lg" className="mt-2" asChild>
-                <Link to="/work-with-us" onClick={() => setIsMenuOpen(false)}>
+                <a href="mailto:researchreadyservices@gmail.com?subject=Project%20Application%20-%20ResearchReady&body=Full%20Name%3A%0ACountry%3A%0AProject%20Type%3A%0ABudget%20Range%3A%0ADeadline%3A%0A%0AProject%20Description%3A%0A%0APlease%20attach%20any%20relevant%20documents." onClick={() => setIsMenuOpen(false)}>
                   Apply for a Project
                   <ArrowRight className="w-4 h-4 ml-1" />
-                </Link>
+                </a>
               </Button>
             </div>
           </nav>
