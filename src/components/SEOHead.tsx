@@ -7,6 +7,8 @@ interface SEOHeadProps {
   image?: string;
   url?: string;
   type?: string;
+  schema?: object | object[];
+  noindex?: boolean;
 }
 
 const SEOHead = ({
@@ -16,6 +18,8 @@ const SEOHead = ({
   image = "/og-image.png",
   url = "https://researchready.com",
   type = "website",
+  schema,
+  noindex = false,
 }: SEOHeadProps) => {
   const fullTitle = title.includes("ResearchReady")
     ? title
@@ -142,6 +146,16 @@ const SEOHead = ({
           },
         })}
       </script>
+      
+      {/* Custom Schema (FAQ, Article, etc.) */}
+      {schema && (
+        <script type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      )}
+      
+      {/* Noindex for pages that shouldn't be indexed */}
+      {noindex && <meta name="robots" content="noindex, nofollow" />}
     </Helmet>
   );
 };

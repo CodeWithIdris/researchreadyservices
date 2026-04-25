@@ -45,12 +45,27 @@ const faqs = [
 ];
 
 const FAQs = () => {
+  // FAQ Schema for SEO
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead 
         title="FAQs - Frequently Asked Questions"
         description="Find answers to common questions about ResearchReady's academic writing services, pricing, turnaround times, and quality guarantees."
         url="https://researchready.com/faqs"
+        schema={faqSchema}
       />
       <Header />
       <main className="pt-24 pb-20">
