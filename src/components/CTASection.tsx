@@ -61,6 +61,22 @@ const CTASection = () => {
               <span>+234 902 228 2963</span>
             </a>
           </div>
+          
+          {/* Related Links - Internal Linking for SEO */}
+          <div className="mt-12 pt-8 border-t border-border">
+            <p className="text-sm text-muted-foreground mb-4">Explore more:</p>
+            <div className="flex flex-wrap justify-center gap-3">
+              {relatedLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className="inline-flex items-center px-4 py-2 bg-secondary hover:bg-secondary/80 rounded-lg text-sm text-foreground transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
