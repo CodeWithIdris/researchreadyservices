@@ -547,6 +547,46 @@ const WorkWithUs = () => {
         </div>
       </section>
 
+      {/* Related Content - Internal Linking for SEO */}
+      <section className="py-16 bg-secondary/30">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <h2 className="font-playfair text-2xl lg:text-3xl font-bold text-foreground mb-3">Learn More About Our Services</h2>
+            <p className="text-muted-foreground">Explore how we can help you achieve your research and business goals</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            <a 
+              href="/about" 
+              className="block p-6 bg-background rounded-xl border border-border hover:border-accent/30 hover:shadow-md transition-all text-center"
+            >
+              <h3 className="font-semibold text-foreground mb-2">About Us</h3>
+              <p className="text-sm text-muted-foreground">Learn about our 10+ year journey and mission</p>
+            </a>
+            <a 
+              href="/faqs" 
+              className="block p-6 bg-background rounded-xl border border-border hover:border-accent/30 hover:shadow-md transition-all text-center"
+            >
+              <h3 className="font-semibold text-foreground mb-2">FAQs</h3>
+              <p className="text-sm text-muted-foreground">Find answers to common questions</p>
+            </a>
+            <a 
+              href="/book" 
+              className="block p-6 bg-background rounded-xl border border-border hover:border-accent/30 hover:shadow-md transition-all text-center"
+            >
+              <h3 className="font-semibold text-foreground mb-2">Book Consultation</h3>
+              <p className="text-sm text-muted-foreground">Schedule a free 15-minute discovery call</p>
+            </a>
+            <a 
+              href="/#services" 
+              className="block p-6 bg-background rounded-xl border border-border hover:border-accent/30 hover:shadow-md transition-all text-center"
+            >
+              <h3 className="font-semibold text-foreground mb-2">Our Services</h3>
+              <p className="text-sm text-muted-foreground">Explore our full range of research services</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Minimal footer */}
       <div className="bg-primary py-6">
         <div className="container mx-auto px-4 text-center">
