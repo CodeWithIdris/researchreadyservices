@@ -79,6 +79,25 @@ const TestimonialsSection = () => {
             </div>
           ))}
         </div>
+        
+        {/* Internal Linking - CTA */}
+        <div className="mt-16 text-center">
+          <p className="text-primary-foreground/80 mb-6">Join thousands of satisfied clients worldwide</p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link 
+              to="/work-with-us" 
+              className="inline-flex items-center px-6 py-3 bg-accent text-accent-foreground hover:bg-accent/90 rounded-lg font-semibold transition-colors"
+            >
+              Apply for a Project
+            </Link>
+            <Link 
+              to="/about" 
+              className="inline-flex items-center px-6 py-3 bg-primary-foreground/10 hover:bg-primary-foreground/20 rounded-lg text-primary-foreground font-medium transition-colors"
+            >
+              Learn More About Us
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   );
