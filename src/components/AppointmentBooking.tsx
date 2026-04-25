@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { CalendarDays, Clock, Video, User, Mail, Phone, Globe } from "lucide-react";
 import { z } from "zod";
+import { trackConversion } from "@/lib/analytics";
 
 const appointmentSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
