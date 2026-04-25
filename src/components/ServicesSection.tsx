@@ -57,6 +57,7 @@ const ServicesSection = () => {
               to="/work-with-us"
               className="group bg-card rounded-xl p-6 lg:p-8 shadow-sm border border-border hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in text-left block"
               style={{ animationDelay: `${index * 0.1}s` }}
+              aria-label={`Learn more about ${service.title}`}
             >
               <div className="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-accent/20 transition-colors">
                 <service.icon className="w-7 h-7 text-accent" />
@@ -72,6 +73,34 @@ const ServicesSection = () => {
               </span>
             </Link>
           ))}
+        </div>
+
+        {/* Internal Linking - Related Pages */}
+        <div className="mt-16 pt-12 border-t border-border">
+          <div className="text-center mb-8">
+            <h3 className="font-playfair text-2xl font-bold text-foreground mb-2">Explore More</h3>
+            <p className="text-muted-foreground">Learn more about how we can help you succeed</p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link 
+              to="/about" 
+              className="inline-flex items-center px-6 py-3 bg-secondary hover:bg-secondary/80 rounded-lg text-foreground font-medium transition-colors"
+            >
+              About Our Company
+            </Link>
+            <Link 
+              to="/faqs" 
+              className="inline-flex items-center px-6 py-3 bg-secondary hover:bg-secondary/80 rounded-lg text-foreground font-medium transition-colors"
+            >
+              Frequently Asked Questions
+            </Link>
+            <Link 
+              to="/book" 
+              className="inline-flex items-center px-6 py-3 bg-secondary hover:bg-secondary/80 rounded-lg text-foreground font-medium transition-colors"
+            >
+              Book a Consultation
+            </Link>
+          </div>
         </div>
       </div>
     </section>
