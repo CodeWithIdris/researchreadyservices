@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, CalendarDays, LayoutDashboard, LogIn, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackCTAClick, trackConversion } from "@/lib/analytics";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -67,7 +68,13 @@ const Header = () => {
               </Button>
             )}
             <Button variant="gold" asChild>
-              <a href="mailto:researchreadyservices@gmail.com?subject=Project%20Application%20-%20ResearchReady&body=Full%20Name%3A%0ACountry%3A%0AProject%20Type%3A%0ABudget%20Range%3A%0ADeadline%3A%0A%0AProject%20Description%3A%0A%0APlease%20attach%20any%20relevant%20documents.">
+              <a
+                href="mailto:researchreadyservices@gmail.com?subject=Project%20Application%20-%20ResearchReady&body=Full%20Name%3A%0ACountry%3A%0AProject%20Type%3A%0ABudget%20Range%3A%0ADeadline%3A%0A%0AProject%20Description%3A%0A%0APlease%20attach%20any%20relevant%20documents."
+                onClick={() => {
+                  trackCTAClick("apply_project_email", "Apply for a Project", "header_desktop");
+                  trackConversion("lead_apply_email", { source: "header_desktop" });
+                }}
+              >
                 Apply for a Project
                 <ArrowRight className="w-4 h-4 ml-1" />
               </a>
@@ -130,7 +137,14 @@ const Header = () => {
                 </Button>
               )}
               <Button variant="gold" size="lg" className="mt-2" asChild>
-                <a href="mailto:researchreadyservices@gmail.com?subject=Project%20Application%20-%20ResearchReady&body=Full%20Name%3A%0ACountry%3A%0AProject%20Type%3A%0ABudget%20Range%3A%0ADeadline%3A%0A%0AProject%20Description%3A%0A%0APlease%20attach%20any%20relevant%20documents." onClick={() => setIsMenuOpen(false)}>
+                <a
+                  href="mailto:researchreadyservices@gmail.com?subject=Project%20Application%20-%20ResearchReady&body=Full%20Name%3A%0ACountry%3A%0AProject%20Type%3A%0ABudget%20Range%3A%0ADeadline%3A%0A%0AProject%20Description%3A%0A%0APlease%20attach%20any%20relevant%20documents."
+                  onClick={() => {
+                    trackCTAClick("apply_project_email", "Apply for a Project", "header_mobile");
+                    trackConversion("lead_apply_email", { source: "header_mobile" });
+                    setIsMenuOpen(false);
+                  }}
+                >
                   Apply for a Project
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </a>

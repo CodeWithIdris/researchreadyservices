@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, Phone, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
+import { trackCTAClick, trackConversion } from "@/lib/analytics";
 
 const relatedLinks = [
   { label: "About Us", href: "/about" },
@@ -33,13 +34,24 @@ const CTASection = () => {
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
             <Button variant="gold" size="xl" className="group" asChild>
-              <a href="mailto:researchreadyservices@gmail.com?subject=Project%20Application%20-%20ResearchReady&body=Full%20Name%3A%0ACountry%3A%0AProject%20Type%3A%0ABudget%20Range%3A%0ADeadline%3A%0A%0AProject%20Description%3A%0A%0APlease%20attach%20any%20relevant%20documents.">
+              <a
+                href="mailto:researchreadyservices@gmail.com?subject=Project%20Application%20-%20ResearchReady&body=Full%20Name%3A%0ACountry%3A%0AProject%20Type%3A%0ABudget%20Range%3A%0ADeadline%3A%0A%0AProject%20Description%3A%0A%0APlease%20attach%20any%20relevant%20documents."
+                onClick={() => {
+                  trackCTAClick("apply_project_email", "Apply for a Project", "cta_section");
+                  trackConversion("lead_apply_email", { source: "cta_section" });
+                }}
+              >
                 Apply for a Project
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </a>
             </Button>
             <Button variant="outline" size="xl" asChild>
-              <Link to="/book">
+              <Link
+                to="/book"
+                onClick={() =>
+                  trackCTAClick("book_consultation", "Book a Consultation", "cta_section")
+                }
+              >
                 Book a Consultation
               </Link>
             </Button>
@@ -48,6 +60,7 @@ const CTASection = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-8 pt-8 border-t border-border">
             <a
               href="mailto:researchreadyservices@gmail.com"
+              onClick={() => trackConversion("email_contact", { source: "cta_section_footer" })}
               className="flex items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors"
             >
               <Mail className="h-5 w-5" />
@@ -55,6 +68,7 @@ const CTASection = () => {
             </a>
             <a
               href="tel:+2349022282963"
+              onClick={() => trackConversion("phone_contact", { source: "cta_section_footer" })}
               className="flex items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors"
             >
               <Phone className="h-5 w-5" />

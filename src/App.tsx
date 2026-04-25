@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { usePageViewTracking } from "@/hooks/usePageViewTracking";
+import GAVerification from "@/components/GAVerification";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import FAQs from "./pages/FAQs";
@@ -23,6 +25,11 @@ import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
+const RouteTracker = () => {
+  usePageViewTracking();
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -30,6 +37,8 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <RouteTracker />
+          <GAVerification />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/about" element={<AboutUs />} />

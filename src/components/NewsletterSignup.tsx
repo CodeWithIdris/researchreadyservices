@@ -5,6 +5,7 @@ import { Mail, CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
+import { trackConversion } from "@/lib/analytics";
 
 const emailSchema = z.string().trim().email({ message: "Please enter a valid email address" }).max(255);
 
@@ -41,6 +42,7 @@ const NewsletterSignup = () => {
       }
 
       setIsSubmitted(true);
+      trackConversion("newsletter_subscribe", { source: "footer" });
       toast({
         title: "Subscribed!",
         description: "Thank you for subscribing to our newsletter.",
