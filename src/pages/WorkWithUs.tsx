@@ -233,6 +233,7 @@ const WorkWithUs = () => {
       <SEOHead
         title="Work With Us – Premium Research & Consulting | ResearchReady"
         description="Apply for premium research and consulting services. We deliver publication-grade research, reports, and analysis for professionals and businesses worldwide."
+        url="https://researchready.com/work-with-us"
       />
 
       {/* Minimal top bar */}
