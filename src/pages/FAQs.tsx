@@ -65,8 +65,8 @@ const FAQs = () => {
         title="FAQs - Frequently Asked Questions"
         description="Find answers to common questions about ResearchReady's academic writing services, pricing, turnaround times, and quality guarantees."
         url="https://researchready.com/faqs"
+        schema={faqSchema}
       />
-      <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       <Header />
       <main className="pt-24 pb-20">
         <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
