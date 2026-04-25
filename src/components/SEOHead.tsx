@@ -146,6 +146,16 @@ const SEOHead = ({
           },
         })}
       </script>
+      
+      {/* Custom Schema (FAQ, Article, etc.) */}
+      {schema && (
+        <script type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      )}
+      
+      {/* Noindex for pages that shouldn't be indexed */}
+      {noindex && <meta name="robots" content="noindex, nofollow" />}
     </Helmet>
   );
 };
