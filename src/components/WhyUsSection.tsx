@@ -87,6 +87,25 @@ const WhyUsSection = () => {
               </div>
             ))}
           </div>
+          
+          {/* Internal Linking - CTA */}
+          <div className="mt-12 text-center">
+            <p className="text-muted-foreground mb-4">Ready to experience our premium service?</p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link 
+                to="/work-with-us" 
+                className="inline-flex items-center px-6 py-3 bg-accent text-accent-foreground hover:bg-accent/90 rounded-lg font-semibold transition-colors"
+              >
+                Apply for a Project
+              </Link>
+              <Link 
+                to="/book" 
+                className="inline-flex items-center px-6 py-3 bg-secondary hover:bg-secondary/80 rounded-lg text-foreground font-medium transition-colors"
+              >
+                Book a Consultation
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>
