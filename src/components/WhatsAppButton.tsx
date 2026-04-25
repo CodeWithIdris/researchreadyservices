@@ -1,5 +1,6 @@
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackConversion, trackCTAClick } from "@/lib/analytics";
 
 const WhatsAppButton = () => {
   const phoneNumber = "2349022282963";
@@ -11,6 +12,10 @@ const WhatsAppButton = () => {
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackCTAClick("whatsapp_contact", "Chat on WhatsApp", "floating_button");
+        trackConversion("whatsapp_contact", { source: "floating_button" });
+      }}
       className="fixed bottom-24 right-6 z-40 group"
       aria-label="Chat on WhatsApp"
     >
