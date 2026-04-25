@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import SEOHead from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
+import { trackConversion } from "@/lib/analytics";
 import {
   Shield,
   Clock,
@@ -186,6 +187,15 @@ const WorkWithUs = () => {
           value: formData.budgetRange,
         });
       }
+
+      // GA4 conversion
+      trackConversion("lead_form_submit", {
+        source: "work_with_us",
+        project_type: formData.projectType,
+        budget_range: formData.budgetRange,
+        priority,
+        value: priority === "high" ? 100 : priority === "medium" ? 50 : 10,
+      });
 
       // Show response based on priority
       if (priority === "high") {
