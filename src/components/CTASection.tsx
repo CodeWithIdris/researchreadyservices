@@ -2,6 +2,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, Phone, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 
+const relatedLinks = [
+  { label: "About Us", href: "/about" },
+  { label: "FAQs", href: "/faqs" },
+  { label: "Book Consultation", href: "/book" },
+  { label: "Our Services", href: "/#services" },
+];
+
 const CTASection = () => {
   return (
     <section id="contact" className="py-20 lg:py-32 bg-background relative overflow-hidden">
