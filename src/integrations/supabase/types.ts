@@ -193,6 +193,44 @@ export type Database = {
         }
         Relationships: []
       }
+      enquiry_documents: {
+        Row: {
+          created_at: string
+          id: string
+          lead_id: string
+          mime_type: string
+          original_name: string
+          size_bytes: number
+          storage_path: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lead_id: string
+          mime_type: string
+          original_name: string
+          size_bytes: number
+          storage_path: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lead_id?: string
+          mime_type?: string
+          original_name?: string
+          size_bytes?: number
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enquiry_documents_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "project_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_room_players: {
         Row: {
           best_streak: number
@@ -371,52 +409,94 @@ export type Database = {
       }
       project_leads: {
         Row: {
+          ad_angle: string | null
           budget_range: string
           country: string
           created_at: string
           deadline: string
           description: string
+          discipline: string | null
           email: string
           fast_response: boolean | null
           id: string
+          landing_page: string | null
           name: string
+          preferred_contact: string | null
           priority: string
           project_type: string
+          referrer: string | null
+          research_level: string | null
+          research_stage: string | null
           source: string | null
           status: string
+          support_type: string | null
           updated_at: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          whatsapp: string | null
         }
         Insert: {
+          ad_angle?: string | null
           budget_range: string
           country: string
           created_at?: string
           deadline: string
           description: string
+          discipline?: string | null
           email: string
           fast_response?: boolean | null
           id?: string
+          landing_page?: string | null
           name: string
+          preferred_contact?: string | null
           priority?: string
           project_type: string
+          referrer?: string | null
+          research_level?: string | null
+          research_stage?: string | null
           source?: string | null
           status?: string
+          support_type?: string | null
           updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          whatsapp?: string | null
         }
         Update: {
+          ad_angle?: string | null
           budget_range?: string
           country?: string
           created_at?: string
           deadline?: string
           description?: string
+          discipline?: string | null
           email?: string
           fast_response?: boolean | null
           id?: string
+          landing_page?: string | null
           name?: string
+          preferred_contact?: string | null
           priority?: string
           project_type?: string
+          referrer?: string | null
+          research_level?: string | null
+          research_stage?: string | null
           source?: string | null
           status?: string
+          support_type?: string | null
           updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }
