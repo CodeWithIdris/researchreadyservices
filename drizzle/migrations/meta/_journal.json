@@ -8,6 +8,13 @@
       "when": 1789907467257,
       "tag": "0000_secure_research_enquiries",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790152679959,
+      "tag": "0001_protect_research_enquiry_storage",
+      "breakpoints": true
     }
   ]
 }
