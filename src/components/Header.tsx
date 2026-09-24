@@ -1,18 +1,19 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, CalendarDays, LayoutDashboard, LogIn, ArrowRight } from "lucide-react";
+import { Menu, X, LayoutDashboard, LogIn, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { trackCTAClick, trackConversion } from "@/lib/analytics";
+import { trackCTAClick } from "@/lib/analytics";
+import { consultationUrl } from "@/lib/siteConfig";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = useAuth();
 
   const navLinks = [
+    { name: "Services", href: "/services" },
+    { name: "Research Insights", href: "/insights" },
     { name: "About", href: "/about" },
-    { name: "Services", href: "/#services" },
-    { name: "Book Consultation", href: "/book", icon: CalendarDays },
   ];
 
   return (
@@ -35,7 +36,6 @@ const Header = () => {
                   to={link.href}
                   className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium flex items-center gap-1"
                 >
-                  {link.icon && <link.icon className="w-4 h-4" />}
                   {link.name}
                 </Link>
               ) : (
@@ -69,13 +69,12 @@ const Header = () => {
             )}
             <Button variant="gold" asChild>
               <a
-                href="mailto:researchreadyservices@gmail.com?subject=Project%20Application%20-%20ResearchReady&body=Full%20Name%3A%0ACountry%3A%0AProject%20Type%3A%0ABudget%20Range%3A%0ADeadline%3A%0A%0AProject%20Description%3A%0A%0APlease%20attach%20any%20relevant%20documents."
+                href={consultationUrl()}
                 onClick={() => {
-                  trackCTAClick("apply_project_email", "Apply for a Project", "header_desktop");
-                  trackConversion("lead_apply_email", { source: "header_desktop" });
+                  trackCTAClick("discuss_research", "Discuss Your Research", "header_desktop");
                 }}
               >
-                Apply for a Project
+                Discuss Your Research
                 <ArrowRight className="w-4 h-4 ml-1" />
               </a>
             </Button>
@@ -107,7 +106,6 @@ const Header = () => {
                     className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium py-2 flex items-center gap-2"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    {link.icon && <link.icon className="w-4 h-4" />}
                     {link.name}
                   </Link>
                 ) : (
@@ -138,14 +136,13 @@ const Header = () => {
               )}
               <Button variant="gold" size="lg" className="mt-2" asChild>
                 <a
-                  href="mailto:researchreadyservices@gmail.com?subject=Project%20Application%20-%20ResearchReady&body=Full%20Name%3A%0ACountry%3A%0AProject%20Type%3A%0ABudget%20Range%3A%0ADeadline%3A%0A%0AProject%20Description%3A%0A%0APlease%20attach%20any%20relevant%20documents."
+                  href={consultationUrl()}
                   onClick={() => {
-                    trackCTAClick("apply_project_email", "Apply for a Project", "header_mobile");
-                    trackConversion("lead_apply_email", { source: "header_mobile" });
+                    trackCTAClick("discuss_research", "Discuss Your Research", "header_mobile");
                     setIsMenuOpen(false);
                   }}
                 >
-                  Apply for a Project
+                  Discuss Your Research
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </a>
               </Button>

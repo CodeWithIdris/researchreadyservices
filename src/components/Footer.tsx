@@ -1,20 +1,22 @@
 import { Facebook, Twitter, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { openConsentSettings } from "@/lib/consent";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const links = {
     services: [
-      { name: "Dissertation & Thesis Writing", href: "/work-with-us" },
-      { name: "Literature Reviews", href: "/work-with-us" },
-      { name: "Data Analysis", href: "/work-with-us" },
-      { name: "Business Research", href: "/work-with-us" },
+      { name: "PhD Research Support", href: "/services/phd-dissertation-support" },
+      { name: "Literature Reviews", href: "/services/literature-review-services" },
+      { name: "Data Analysis", href: "/services/spss-data-analysis" },
+      { name: "Professional Research", href: "/services/professional-research-services" },
     ],
     company: [
       { name: "About Us", href: "/about" },
-      { name: "Work With Us", href: "/work-with-us" },
-      { name: "Book Consultation", href: "/book" },
+      { name: "Research Insights", href: "/insights" },
+      { name: "Discuss Your Research", href: "/work-with-us" },
     ],
     support: [
       { name: "Support", href: "/support" },
@@ -43,7 +45,7 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-primary-foreground/70 mb-6 max-w-sm">
-              Premium research and consulting services for professionals and businesses worldwide since 2014.
+              Research support built around the problem you're actually trying to solve.
             </p>
             <div className="flex gap-4">
               {socialLinks.map((social) => (
@@ -118,8 +120,9 @@ const Footer = () => {
             © {currentYear} ResearchReady Services. All rights reserved.
           </p>
           <p className="text-primary-foreground/60 text-sm">
-            Premium research & consulting for serious clients.
+            ResearchReady is where serious research problems meet structured expertise.
           </p>
+          <Button variant="link" className="h-auto p-0 text-primary-foreground/60" onClick={openConsentSettings}>Cookie settings</Button>
         </div>
       </div>
     </footer>
