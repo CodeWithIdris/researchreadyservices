@@ -36,7 +36,6 @@ const Header = () => {
                   to={link.href}
                   className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium flex items-center gap-1"
                 >
-                  {link.icon && <link.icon className="w-4 h-4" />}
                   {link.name}
                 </Link>
               ) : (
@@ -107,7 +106,6 @@ const Header = () => {
                     className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium py-2 flex items-center gap-2"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    {link.icon && <link.icon className="w-4 h-4" />}
                     {link.name}
                   </Link>
                 ) : (
