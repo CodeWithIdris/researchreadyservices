@@ -68,8 +68,8 @@ export default {
         cream: "hsl(var(--cream))",
       },
       fontFamily: {
-        playfair: ["Playfair Display", "serif"],
-        sans: ["Inter", "system-ui", "sans-serif"],
+        playfair: ["Libre Baskerville", "serif"],
+        sans: ["DM Sans", "system-ui", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
