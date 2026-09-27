@@ -111,6 +111,11 @@ All colors MUST be HSL.
   }
 }
 
+@layer components {
+  .eyebrow { @apply mb-4 text-xs font-semibold uppercase text-accent; letter-spacing: .18em; }
+  .section-title { @apply font-playfair text-3xl leading-tight text-primary sm:text-4xl; }
+}
+
 @layer utilities {
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-navy-light;

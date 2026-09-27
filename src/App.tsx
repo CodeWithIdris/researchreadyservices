@@ -6,6 +6,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { usePageViewTracking } from "@/hooks/usePageViewTracking";
 import GAVerification from "@/components/GAVerification";
+import CookieConsent from "@/components/CookieConsent";
+import Services from "./pages/Services";
+import ServiceDetail from "./pages/ServiceDetail";
+import Insights from "./pages/Insights";
+import InsightDetail from "./pages/InsightDetail";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import FAQs from "./pages/FAQs";
@@ -38,6 +43,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <RouteTracker />
+          <CookieConsent />
           <GAVerification />
           <Routes>
             <Route path="/" element={<Index />} />
@@ -49,6 +55,11 @@ const App = () => (
             <Route path="/support" element={<Support />} />
             <Route path="/book" element={<BookAppointment />} />
             <Route path="/work-with-us" element={<WorkWithUs />} />
+            <Route path="/research/:angle" element={<WorkWithUs />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/services/:slug" element={<ServiceDetail />} />
+            <Route path="/insights" element={<Insights />} />
+            <Route path="/insights/:slug" element={<InsightDetail />} />
             <Route path="/auth" element={<ClientAuth />} />
             <Route path="/dashboard" element={<ClientDashboard />} />
             <Route path="/settings" element={<Settings />} />
