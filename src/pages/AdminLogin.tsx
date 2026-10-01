@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Lock } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
+import { SITE_URL } from "@/lib/siteConfig";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -86,6 +87,7 @@ const AdminLogin = () => {
       <SEOHead
         title="Admin Login | ResearchReady"
         description="Admin login portal for ResearchReady dashboard."
+        url={`${SITE_URL}/admin`}
         noindex
       />
       <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">

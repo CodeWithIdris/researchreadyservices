@@ -1,9 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /settings
-Disallow: /auth
-Disallow: /game
 
 Sitemap: https://researchreadyservices.lovable.app/sitemap.xml

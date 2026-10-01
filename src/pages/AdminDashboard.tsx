@@ -14,6 +14,7 @@ import {
   Calendar, Clock, RefreshCw, Eye, Bell, Target, Zap, Filter, FileText, ExternalLink
 } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
+import { SITE_URL } from "@/lib/siteConfig";
 
 interface ChatSession {
   id: string;
@@ -429,6 +430,7 @@ const AdminDashboard = () => {
       <SEOHead
         title="Admin Dashboard | ResearchReady"
         description="Manage chat sessions, support tickets, and newsletter subscribers."
+        url={`${SITE_URL}/admin/dashboard`}
         noindex
       />
       <div className="min-h-screen bg-muted/30">

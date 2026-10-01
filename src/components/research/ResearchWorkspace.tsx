@@ -1,7 +1,7 @@
 import { BarChart3, BookOpen, Braces, FileText } from "lucide-react";
 
 const ResearchWorkspace = () => (
-  <div className="relative min-h-[380px] border border-primary/20 bg-card p-5 shadow-xl lg:min-h-[470px]" aria-label="Research workspace showing papers, notes and analysis">
+  <div className="relative min-h-[380px] border border-primary/20 bg-card p-5 shadow-sm lg:min-h-[470px]" aria-label="Research workspace showing papers, notes and analysis">
     <div className="flex items-center justify-between border-b border-border pb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
       <span>Research workspace</span><span>Evidence → argument</span>
     </div>

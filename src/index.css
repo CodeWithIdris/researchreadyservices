@@ -117,10 +117,6 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-navy-light;
-  }
-  
   .gold-underline {
     @apply relative inline-block;
   }
