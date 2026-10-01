@@ -424,6 +424,7 @@ const AdminDashboard = () => {
       <SEOHead
         title="Admin Dashboard | ResearchReady"
         description="Manage chat sessions, support tickets, and newsletter subscribers."
+        noindex
       />
       <div className="min-h-screen bg-muted/30">
         {/* Header */}

@@ -374,7 +374,7 @@ const WordChallenge = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Word Challenge Game" description="Test your vocabulary with 500+ English words!" url="https://researchready.com/game" />
+      <SEOHead title="Word Challenge Game" description="A vocabulary game from ResearchReady." url="https://researchreadyservices.lovable.app/game" noindex />
       <Header />
       
       <main className="pt-24 pb-16">

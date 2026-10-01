@@ -3,7 +3,24 @@
   <url><loc>https://researchreadyservices.lovable.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://researchreadyservices.lovable.app/services</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://researchreadyservices.lovable.app/insights</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://researchreadyservices.lovable.app/work-with-us</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/phd-dissertation-support</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/masters-thesis-support</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/research-methodology-support</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/literature-review-services</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/systematic-review-support</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/scoping-review-support</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/spss-data-analysis</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/r-statistical-analysis</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/stata-data-analysis</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/academic-manuscript-support</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/conference-paper-support</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/research-consulting</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/services/professional-research-services</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/insights/more-papers-less-argument</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/insights/systematic-review-before-first-paper</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/insights/software-answer-without-meaning</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/insights/twenty-more-references</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://researchreadyservices.lovable.app/insights/analysing-versus-understanding-data</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://researchreadyservices.lovable.app/about</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://researchreadyservices.lovable.app/faqs</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://researchreadyservices.lovable.app/book</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>

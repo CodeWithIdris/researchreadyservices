@@ -57,19 +57,33 @@ if (typeof window !== "undefined") {
 
 const allowed = () => readConsent()?.choice === "accepted";
 const baseParams = () => ({ ...getAttribution() });
+const eventId = () => crypto.randomUUID();
+
+const pageLocation = () => {
+  const url = new URL(window.location.href);
+  const allowedParams = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid", "gclid"];
+  [...url.searchParams.keys()].forEach((key) => {
+    if (!allowedParams.includes(key)) url.searchParams.delete(key);
+  });
+  return `${url.origin}${url.pathname}${url.search}`;
+};
 
 export const trackEvent = (eventName: string, params: Record<string, unknown> = {}) => {
   if (!allowed()) return;
   initializeVendors();
-  window.gtag?.("event", eventName, { ...baseParams(), ...params });
+  const id = eventId();
+  const eventParams = { ...baseParams(), ...params, event_id: id };
+  window.gtag?.("event", eventName, eventParams);
+  window.fbq?.("trackCustom", eventName, eventParams, { eventID: id });
 };
 
 export const trackPageView = (path: string, title?: string) => {
   if (!allowed()) return;
   initializeVendors();
-  const params = { page_path: path, page_title: title || document.title, page_location: window.location.href, ...baseParams() };
+  const id = eventId();
+  const params = { page_path: path.split("?")[0], page_title: title || document.title, page_location: pageLocation(), ...baseParams(), event_id: id };
   window.gtag?.("event", "page_view", params);
-  window.fbq?.("track", "PageView");
+  window.fbq?.("track", "PageView", params, { eventID: id });
 };
 
 export const trackCTAClick = (ctaId: string, label: string, location: string, extra: Record<string, unknown> = {}) =>
@@ -86,8 +100,8 @@ export const trackResearchLevelSelected = (level: string) => trackEvent("Researc
 export const trackFileUploaded = (type: string, size: number) => trackEvent("FileUploaded", { file_type: type, file_size: size });
 
 export const trackConversion = (conversionType: string, params: Record<string, unknown> = {}) => {
-  trackEvent("generate_lead", { conversion_type: conversionType, currency: "USD", ...params });
-  if (allowed()) window.fbq?.("track", "Lead", { content_name: conversionType, ...params });
+  const eventName = ["ConsultationSubmitted", "ContactSubmitted"].includes(conversionType) ? conversionType : "generate_lead";
+  trackEvent(eventName, { conversion_type: conversionType, ...params });
 };
 
 export const isGAReady = () => allowed() && typeof window.gtag === "function";

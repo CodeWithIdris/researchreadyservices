@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import SEOHead from "@/components/SEOHead";
 import { usePageViewTracking } from "@/hooks/usePageViewTracking";
 import GAVerification from "@/components/GAVerification";
 import CookieConsent from "@/components/CookieConsent";
@@ -59,9 +60,9 @@ const App = () => (
             <Route path="/services/:slug" element={<ServiceDetail />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/insights/:slug" element={<InsightDetail />} />
-            <Route path="/auth" element={<ClientAuth />} />
-            <Route path="/dashboard" element={<ClientDashboard />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/auth" element={<><SEOHead title="Client Portal | ResearchReady" noindex /><ClientAuth /></>} />
+            <Route path="/dashboard" element={<><SEOHead title="Client Dashboard | ResearchReady" noindex /><ClientDashboard /></>} />
+            <Route path="/settings" element={<><SEOHead title="Profile Settings | ResearchReady" noindex /><Settings /></>} />
             <Route path="/game" element={<WordChallenge />} />
             <Route path="/admin" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />

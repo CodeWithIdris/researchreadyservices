@@ -86,6 +86,7 @@ const AdminLogin = () => {
       <SEOHead
         title="Admin Login | ResearchReady"
         description="Admin login portal for ResearchReady dashboard."
+        noindex
       />
       <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
         <Card className="w-full max-w-md">

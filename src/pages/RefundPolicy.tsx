@@ -8,8 +8,8 @@ const RefundPolicy = () => {
     <div className="min-h-screen bg-background">
       <SEOHead 
         title="Refund Policy"
-        description="Understand ResearchReady's refund policy. Learn about our money-back guarantee and the conditions for requesting refunds on our services."
-        url="https://researchready.com/refund"
+        description="How ResearchReady reviews cancellation and refund requests against the agreed scope and work completed."
+        url="https://researchreadyservices.lovable.app/refund"
       />
       <Header />
       <main className="pt-24 pb-20">
@@ -18,14 +18,14 @@ const RefundPolicy = () => {
             <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
               Refund Policy
             </h1>
-            <p className="text-muted-foreground">Last updated: December 2024</p>
+            <p className="text-muted-foreground">Last updated: October 2026</p>
           </div>
 
           <div className="prose prose-lg max-w-none text-muted-foreground space-y-8">
             <section>
               <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">1. Our Commitment</h2>
               <p>
-                At ResearchReady Services, we are committed to delivering high-quality academic support. We understand that sometimes circumstances may require a refund, and we have established this policy to ensure fair treatment for all our clients.
+                Refund requests are reviewed against the written scope, payment terms and work completed. No research, publication or academic outcome is guaranteed.
               </p>
             </section>
 
@@ -67,7 +67,7 @@ const RefundPolicy = () => {
             <section>
               <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">5. Revision Policy</h2>
               <p>
-                Before requesting a refund, we encourage you to utilize our free revision service. We offer revisions within the scope of your original requirements to ensure your satisfaction. Most concerns can be addressed through our revision process.
+                Where refinement is part of the agreed scope, tell us what needs attention and how it differs from the agreed requirements. Requests beyond that scope are discussed before additional work begins.
               </p>
             </section>
 

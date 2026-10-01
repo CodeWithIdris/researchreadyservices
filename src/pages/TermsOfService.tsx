@@ -8,8 +8,8 @@ const TermsOfService = () => {
     <div className="min-h-screen bg-background">
       <SEOHead 
         title="Terms of Service"
-        description="Read ResearchReady's terms of service. Understand your rights and responsibilities when using our academic writing and research support services."
-        url="https://researchready.com/terms"
+        description="Terms governing ResearchReady's collaborative research consulting, analysis, methodology, interpretation and refinement services."
+        url="https://researchreadyservices.lovable.app/terms"
       />
       <Header />
       <main className="pt-24 pb-20">
@@ -18,7 +18,7 @@ const TermsOfService = () => {
             <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
               Terms of Service
             </h1>
-            <p className="text-muted-foreground">Last updated: December 2024</p>
+            <p className="text-muted-foreground">Last updated: October 2026</p>
           </div>
 
           <div className="prose prose-lg max-w-none text-muted-foreground space-y-8">
@@ -32,7 +32,7 @@ const TermsOfService = () => {
             <section>
               <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">2. Description of Services</h2>
               <p>
-                ResearchReady provides academic writing assistance, research support, editing, and related educational services. Our services are intended to provide guidance, reference materials, and support for your academic endeavors.
+                ResearchReady provides collaborative research consulting, methodology, evidence synthesis, data analysis, interpretation, editing and publication-readiness support for academic, professional and organisational work.
               </p>
             </section>
 
@@ -49,7 +49,7 @@ const TermsOfService = () => {
             <section>
               <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">4. Intellectual Property</h2>
               <p>
-                Upon full payment, you receive rights to use the delivered work for your personal academic purposes. We retain the right to use anonymized portions for quality improvement and training purposes.
+                Each engagement's ownership, permitted use and confidentiality terms are confirmed in its written scope. We do not reuse client research materials for unrelated purposes without permission.
               </p>
             </section>
 

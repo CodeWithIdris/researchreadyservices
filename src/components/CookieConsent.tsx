@@ -23,7 +23,7 @@ const CookieConsent = () => {
     setIsVisible(false);
   };
 
-  if (!isVisible) return null;
+  if (!isVisible) return <Button variant="outline" size="icon" className="fixed bottom-4 left-4 z-40" aria-label="Cookie settings" title="Cookie settings" onClick={() => setIsVisible(true)}><Cookie className="h-4 w-4" /></Button>;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-fade-in" role="dialog" aria-label="Cookie choices">
