@@ -7,7 +7,6 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import SEOHead from "@/components/SEOHead";
 import { SITE_URL } from "@/lib/siteConfig";
 import { usePageViewTracking } from "@/hooks/usePageViewTracking";
-import GAVerification from "@/components/GAVerification";
 import CookieConsent from "@/components/CookieConsent";
 import Services from "./pages/Services";
 import ServiceDetail from "./pages/ServiceDetail";
@@ -46,7 +45,6 @@ const App = () => (
         <BrowserRouter>
           <RouteTracker />
           <CookieConsent />
-          <GAVerification />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/about" element={<AboutUs />} />
