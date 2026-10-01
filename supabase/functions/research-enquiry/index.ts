@@ -16,7 +16,6 @@ const allowedMimeTypes = [
 ];
 
 const budgets = ["$150 – $300", "$300 – $700", "$700 – $1,500", "$1,500+", "Not sure — please assess"];
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
   status,
@@ -30,16 +29,9 @@ const optionalText = (value: unknown, max: number) => {
 };
 const emailValid = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) && value.length <= 255;
 
-function canSubmit(ip: string) {
-  const now = Date.now();
-  const existing = rateLimitStore.get(ip);
-  if (!existing || now > existing.resetAt) {
-    rateLimitStore.set(ip, { count: 1, resetAt: now + 60 * 60 * 1000 });
-    return true;
-  }
-  if (existing.count >= 5) return false;
-  existing.count += 1;
-  return true;
+async function hashAddress(address: string) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(address));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 function priorityFor(budget: string, description: string) {
@@ -97,8 +89,15 @@ serve(async (request) => {
       return json({ url: signed.signedUrl, name: document.original_name });
     }
 
-    const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-    if (!canSubmit(clientIp)) return json({ error: "Too many enquiries. Please try again later." }, 429);
+    const clientAddress = request.headers.get("cf-connecting-ip")
+      || request.headers.get("x-real-ip")
+      || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || "unknown";
+    const { data: canSubmit, error: rateLimitError } = await supabase.rpc("consume_research_enquiry_rate_limit", {
+      _ip_hash: await hashAddress(clientAddress),
+    });
+    if (rateLimitError) return json({ error: "Enquiry service is temporarily unavailable. Please try again later." }, 503);
+    if (!canSubmit) return json({ error: "Too many enquiries. Please try again later." }, 429);
 
     const name = text(body.name, 100);
     const email = text(body.email, 255).toLowerCase();
