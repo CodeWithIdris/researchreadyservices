@@ -48,7 +48,8 @@ const ConsultationForm = ({ source = "consultation_page" }: { source?: string })
     try {
       const attribution = getAttribution();
       const filePayload = file ? { name: file.name, type: file.type, size: file.size, base64: await fileToBase64(file) } : undefined;
-      const { data, error: functionError } = await supabase.functions.invoke("research-enquiry", { body: { ...form, ...attribution, file: filePayload, ad_angle: params.get("angle") || undefined } });
+      const adAngle = params.get("angle") || (source.startsWith("ad_") ? source.slice(3) : undefined);
+      const { data, error: functionError } = await supabase.functions.invoke("research-enquiry", { body: { ...form, ...attribution, file: filePayload, ad_angle: adAngle } });
       if (functionError || !data?.success) throw new Error(data?.error || "We could not submit your enquiry.");
       if (file && data.document_uploaded) trackFileUploaded(file.type, file.size);
       trackConversion("ConsultationSubmitted", { research_level: form.research_level, support_type: form.support_type, source });

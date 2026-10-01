@@ -77,6 +77,11 @@ interface ProjectLead {
   utm_campaign: string | null;
   landing_page: string | null;
   ad_angle: string | null;
+  first_utm_source: string | null;
+  first_utm_medium: string | null;
+  first_utm_campaign: string | null;
+  first_referrer: string | null;
+  first_landing_page: string | null;
 }
 
 interface EnquiryDocument { id: string; lead_id: string; original_name: string; mime_type: string; size_bytes: number; }
@@ -927,7 +932,11 @@ const AdminDashboard = () => {
                     <div><p className="text-sm text-muted-foreground">Research stage</p><p className="font-medium">{selectedLead.research_stage || "Not provided"}</p></div>
                     <div><p className="text-sm text-muted-foreground">Preferred contact</p><p className="font-medium">{selectedLead.preferred_contact || "Not provided"}</p></div>
                     {selectedLead.whatsapp && <div><p className="text-sm text-muted-foreground">WhatsApp</p><p className="font-medium">{selectedLead.whatsapp}</p></div>}
-                    <div><p className="text-sm text-muted-foreground">Campaign</p><p className="font-medium">{selectedLead.utm_campaign || selectedLead.ad_angle || "Organic / untagged"}</p></div>
+                    <div><p className="text-sm text-muted-foreground">Session campaign</p><p className="font-medium">{selectedLead.utm_campaign || selectedLead.ad_angle || "Organic / untagged"}</p></div>
+                    <div><p className="text-sm text-muted-foreground">First-touch campaign</p><p className="font-medium">{selectedLead.first_utm_campaign || selectedLead.first_utm_source || "Organic / untagged"}</p></div>
+                    {selectedLead.landing_page && <div className="min-w-0"><p className="text-sm text-muted-foreground">Landing page</p><p className="break-all text-sm">{selectedLead.landing_page}</p></div>}
+                    {selectedLead.first_landing_page && <div className="min-w-0"><p className="text-sm text-muted-foreground">First landing page</p><p className="break-all text-sm">{selectedLead.first_landing_page}</p></div>}
+                    {selectedLead.first_referrer && <div className="min-w-0"><p className="text-sm text-muted-foreground">First referrer</p><p className="break-all text-sm">{selectedLead.first_referrer}</p></div>}
                   </div>
                   {(leadDocuments[selectedLead.id]?.length || 0) > 0 && <div><p className="mb-2 text-sm text-muted-foreground">Documents</p><div className="space-y-2">{leadDocuments[selectedLead.id].map((document) => <Button key={document.id} variant="outline" className="w-full justify-between" onClick={() => openEnquiryDocument(document)}><span className="flex min-w-0 items-center gap-2"><FileText className="h-4 w-4 shrink-0" /><span className="truncate">{document.original_name}</span></span><ExternalLink className="h-4 w-4 shrink-0" /></Button>)}</div></div>}
                 <div className="flex items-center gap-2">

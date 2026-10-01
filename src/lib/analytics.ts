@@ -100,7 +100,11 @@ export const trackResearchLevelSelected = (level: string) => trackEvent("Researc
 export const trackFileUploaded = (type: string, size: number) => trackEvent("FileUploaded", { file_type: type, file_size: size });
 
 export const trackConversion = (conversionType: string, params: Record<string, unknown> = {}) => {
-  const eventName = ["ConsultationSubmitted", "ContactSubmitted"].includes(conversionType) ? conversionType : "generate_lead";
+  const eventName = conversionType === "ConsultationSubmitted"
+    ? conversionType
+    : ["ContactSubmitted", "email_contact", "phone_contact", "lead_apply_email"].includes(conversionType)
+      ? "ContactSubmitted"
+      : "generate_lead";
   trackEvent(eventName, { conversion_type: conversionType, ...params });
 };
 

@@ -1,5 +1,5 @@
 import { ArrowRight, Check, MessageCircle } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import SEOHead from "@/components/SEOHead";
 import ConsultationForm from "@/components/research/ConsultationForm";
 import { Button } from "@/components/ui/button";
@@ -9,14 +9,15 @@ import { trackCTAClick, trackServiceView, trackWhatsAppClick } from "@/lib/analy
 import { useEffect } from "react";
 
 const WorkWithUs = () => {
+  const { angle: routeAngle } = useParams();
   const [searchParams] = useSearchParams();
-  const angle = searchParams.get("angle") || undefined;
+  const angle = routeAngle || searchParams.get("angle") || undefined;
   const page = getAdLandingPage(angle);
   useEffect(() => { if (page) trackServiceView(page.service, `ad_${page.slug}`); }, [page]);
   const headline = page?.headline || "Research becomes complicated when having more information stops making things clearer.";
   const intro = page?.intro || "ResearchReady helps you identify the problem beneath the research problem — and define a thoughtful way forward.";
   const stages = page?.stages || ["Tell us what you are working on", "We assess what support is appropriate", "We define a clear scope together"];
-  const canonical = page ? `${SITE_URL}/work-with-us?angle=${page.slug}` : `${SITE_URL}/work-with-us`;
+  const canonical = page ? `${SITE_URL}${routeAngle ? `/research/${page.slug}` : `/work-with-us?angle=${page.slug}`}` : `${SITE_URL}/work-with-us`;
   const source = page ? `ad_${page.slug}` : "work_with_us";
 
   return <div className="min-h-screen bg-background">

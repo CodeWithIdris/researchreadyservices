@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Share2 } from "lucide-react";
+import { SITE_URL } from "@/lib/siteConfig";
 
 interface SocialShareProps {
   score: number;
@@ -9,7 +10,7 @@ interface SocialShareProps {
 }
 
 export const SocialShare = ({ score, wordsCompleted, language, gameMode }: SocialShareProps) => {
-  const baseUrl = "https://researchready.com/game";
+  const baseUrl = `${SITE_URL}/game`;
   const modeText = gameMode === "daily" ? "Daily Challenge" : gameMode === "multiplayer" ? "Multiplayer Battle" : "Practice Mode";
   
   const shareText = `🎓 I just scored ${score} points typing ${wordsCompleted} academic words in ${language} on Research Ready's Word Challenge ${modeText}! Can you beat my score? 💪`;
