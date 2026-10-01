@@ -1,17 +1,9 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+Disallow: /game
 
-# Sitemap location
-Sitemap: https://researchready.com/sitemap.xml
+Sitemap: https://researchreadyservices.lovable.app/sitemap.xml

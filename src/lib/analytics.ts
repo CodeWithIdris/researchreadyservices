@@ -6,6 +6,7 @@ declare global {
     gtag?: (...args: unknown[]) => void;
     fbq?: (...args: unknown[]) => void;
     dataLayer?: unknown[];
+    _fbq?: (...args: unknown[]) => void;
   }
 }
 
@@ -31,19 +32,27 @@ const initializeVendors = () => {
   window.gtag("config", GA_MEASUREMENT_ID, { send_page_view: false });
   loadScript("researchready-ga", `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`);
 
-  const fbq = ((...args: unknown[]) => {
-    const queue = (fbq as typeof fbq & { queue?: unknown[][] }).queue || [];
-    queue.push(args);
-    (fbq as typeof fbq & { queue?: unknown[][] }).queue = queue;
-  }) as typeof window.fbq;
+  type MetaQueue = ((...args: unknown[]) => void) & { callMethod?: (...args: unknown[]) => void; queue?: unknown[][]; loaded?: boolean; version?: string };
+  const fbq: MetaQueue = (...args: unknown[]) => {
+    if (fbq.callMethod) fbq.callMethod(...args);
+    else (fbq.queue ||= []).push(args);
+  };
+  fbq.queue = [];
+  fbq.loaded = true;
+  fbq.version = "2.0";
   window.fbq = fbq;
+  window._fbq = fbq;
   window.fbq?.("init", META_PIXEL_ID);
   loadScript("researchready-meta", "https://connect.facebook.net/en_US/fbevents.js");
 };
 
+const handleConsentChange = () => {
+  if (readConsent()?.choice === "accepted") initializeVendors();
+};
+
 if (typeof window !== "undefined") {
   initializeVendors();
-  window.addEventListener(CONSENT_EVENT, initializeVendors);
+  window.addEventListener(CONSENT_EVENT, handleConsentChange);
 }
 
 const allowed = () => readConsent()?.choice === "accepted";

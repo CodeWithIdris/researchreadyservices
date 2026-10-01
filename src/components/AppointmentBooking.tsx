@@ -23,9 +23,9 @@ const appointmentSchema = z.object({
 });
 
 const appointmentTypes = [
-  { value: "consultation", label: "Free Consultation (30 min)", duration: 30 },
-  { value: "project-discussion", label: "Project Discussion (1 hr)", duration: 60 },
-  { value: "thesis-review", label: "Thesis Review (1 hr)", duration: 60 },
+  { value: "consultation", label: "Research Consultation (30 min)", duration: 30 },
+  { value: "project-discussion", label: "Research Project Discussion (1 hr)", duration: 60 },
+  { value: "thesis-review", label: "Thesis Research Review (1 hr)", duration: 60 },
   { value: "data-analysis", label: "Data Analysis Consultation (45 min)", duration: 45 },
 ];
 
@@ -88,12 +88,6 @@ const AppointmentBooking = () => {
     return `${hours12}:${String(minutes).padStart(2, '0')} ${period}`;
   };
 
-  const generateMeetingLink = () => {
-    // Generate a Zoom-style meeting link placeholder
-    const meetingId = Math.random().toString(36).substring(2, 11);
-    return `https://meet.google.com/${meetingId}`;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -117,8 +111,6 @@ const AppointmentBooking = () => {
     setIsLoading(true);
 
     try {
-      const meetingLink = generateMeetingLink();
-      
       // Use edge function with server-side rate limiting and validation
       const { data, error } = await supabase.functions.invoke("appointments", {
         body: {
@@ -130,7 +122,7 @@ const AppointmentBooking = () => {
           appointment_date: selectedDate!.toISOString().split('T')[0],
           appointment_time: formData.time,
           appointment_type: formData.type,
-          meeting_link: meetingLink,
+          meeting_link: null,
           notes: formData.notes || null,
         },
       });
@@ -144,8 +136,8 @@ const AppointmentBooking = () => {
 
       setBookingComplete(true);
       toast({
-        title: "Appointment Booked!",
-        description: "You'll receive a confirmation email shortly with the meeting link.",
+        title: "Consultation request received",
+        description: "Your requested date and research details have been recorded.",
       });
     } catch (error) {
       console.error("Booking error:", error);
@@ -178,9 +170,9 @@ const AppointmentBooking = () => {
         <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
           <CalendarDays className="w-8 h-8 text-green-500" />
         </div>
-        <h3 className="text-2xl font-bold text-foreground mb-2">Booking Confirmed!</h3>
+        <h3 className="text-2xl font-bold text-foreground mb-2">Consultation Request Received</h3>
         <p className="text-muted-foreground mb-4">
-          We've sent a confirmation email to <strong>{formData.email}</strong> with your meeting details.
+          We have recorded the request for <strong>{formData.email}</strong> and will review the details.
         </p>
         <div className="bg-secondary/50 rounded-lg p-4 mb-6">
           <p className="text-sm text-muted-foreground">Appointment Details:</p>
@@ -194,7 +186,7 @@ const AppointmentBooking = () => {
         </div>
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-6">
           <Video className="w-4 h-4" />
-          <span>Video call link will be sent via email</span>
+          <span>Contact details for the consultation will be shared after review.</span>
         </div>
         <Button onClick={resetForm} variant="outline">Book Another Appointment</Button>
       </Card>
@@ -337,7 +329,7 @@ const AppointmentBooking = () => {
         </div>
 
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Booking..." : "Book Appointment"}
+          {isLoading ? "Submitting..." : "Request Consultation"}
         </Button>
       </form>
     </Card>
