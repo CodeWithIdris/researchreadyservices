@@ -1,116 +1,19 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ScrollToTop from "@/components/ScrollToTop";
 import SEOHead from "@/components/SEOHead";
+import { Button } from "@/components/ui/button";
+import { openConsentSettings } from "@/lib/consent";
+import { CONTACT_EMAIL, SITE_URL } from "@/lib/siteConfig";
 
-const PrivacyPolicy = () => {
-  return (
-    <div className="min-h-screen bg-background">
-      <SEOHead 
-        title="Privacy Policy"
-        description="Learn how ResearchReady collects, uses, and protects your personal information. We are committed to maintaining your privacy and data security."
-        url="https://researchready.com/privacy"
-      />
-      <Header />
-      <main className="pt-24 pb-20">
-        <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
-          <div className="text-center mb-12">
-            <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-              Privacy Policy
-            </h1>
-            <p className="text-muted-foreground">Last updated: December 2024</p>
-          </div>
+const sections = [
+  ["Information we collect", "When you submit an enquiry or request a consultation, we may collect your name, email, WhatsApp number, country, research level, discipline, project details, deadline, contact preference and any document you choose to upload. Account, support and payment records may also be collected when you use those services."],
+  ["How information is used", "We use this information to assess research enquiries, define suitable support, communicate with you, provide agreed services, maintain account and support functions, protect the service and meet legal obligations."],
+  ["Research documents", "Enquiry documents are stored in a private area and made available to authorised staff for assessment. Please avoid uploading information that is not needed for the enquiry."],
+  ["Service providers and disclosure", "We use service providers for hosting, secure storage, email, payments and website measurement. We do not sell personal information. Information may also be disclosed when required by law, to protect the service or when you direct us to do so."],
+  ["Analytics and advertising measurement", "With your permission, Google Analytics receives website interaction and device information for measurement, and Meta receives page and conversion events for advertising measurement and optimisation. Campaign details such as UTM parameters and the referring page may be associated with an enquiry. We do not place these measurement tags when you decline."],
+  ["Your choices", "You can accept or decline measurement technologies and change that choice later. You may also request access, correction or deletion of personal information, subject to legal and operational retention requirements."],
+  ["Security and retention", "We use technical and organisational safeguards appropriate to the information handled. Information is retained only as long as necessary for the purpose collected, service delivery, dispute handling and legal obligations. No internet transmission can be guaranteed completely secure."],
+];
 
-          <div className="prose prose-lg max-w-none text-muted-foreground space-y-8">
-            <section>
-              <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">1. Information We Collect</h2>
-              <p>We collect information you provide directly to us, including:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Name and contact information (email address, phone number)</li>
-                <li>Academic institution and field of study</li>
-                <li>Project requirements and specifications</li>
-                <li>Payment information (processed securely through third-party providers)</li>
-                <li>Communications between you and our team</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">2. How We Use Your Information</h2>
-              <p>We use the information we collect to:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Provide, maintain, and improve our services</li>
-                <li>Process your orders and send related information</li>
-                <li>Communicate with you about our services</li>
-                <li>Respond to your inquiries and provide customer support</li>
-                <li>Send promotional communications (with your consent)</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">3. Information Sharing</h2>
-              <p>
-                We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:
-              </p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>With your consent or at your direction</li>
-                <li>With service providers who assist in our operations</li>
-                <li>To comply with legal obligations</li>
-                <li>To protect our rights and prevent fraud</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">4. Data Security</h2>
-              <p>
-                We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the Internet is 100% secure.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">5. Data Retention</h2>
-              <p>
-                We retain your personal information for as long as necessary to fulfill the purposes outlined in this policy, unless a longer retention period is required by law. Project files are retained for a reasonable period to facilitate revisions and support.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">6. Your Rights</h2>
-              <p>You have the right to:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Access your personal information</li>
-                <li>Correct inaccurate information</li>
-                <li>Request deletion of your information</li>
-                <li>Opt-out of promotional communications</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">7. Cookies and Tracking</h2>
-              <p>
-                Our website may use cookies and similar technologies to enhance your experience. You can control cookie settings through your browser preferences.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">8. Changes to This Policy</h2>
-              <p>
-                We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the "Last updated" date.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-playfair text-2xl font-bold text-foreground mb-4">9. Contact Us</h2>
-              <p>
-                If you have questions about this Privacy Policy, please contact us at researchreadyservices@gmail.com or via WhatsApp at +234 902 228 2963.
-              </p>
-            </section>
-          </div>
-        </div>
-      </main>
-      <Footer />
-      <ScrollToTop />
-    </div>
-  );
-};
-
+const PrivacyPolicy = () => <div className="min-h-screen bg-background"><SEOHead title="Privacy Policy" description="How ResearchReady handles research enquiries, uploaded documents, communications and consent-based website measurement." url={`${SITE_URL}/privacy`} /><Header /><main className="pt-24 pb-20"><div className="container max-w-4xl"><p className="eyebrow">Privacy</p><h1 className="font-playfair text-4xl text-primary sm:text-5xl">Privacy Policy</h1><p className="mt-4 text-sm text-muted-foreground">Last updated: 20 September 2026</p><div className="mt-12 space-y-10">{sections.map(([title, copy], index) => <section key={title}><h2 className="font-playfair text-2xl text-primary">{index + 1}. {title}</h2><p className="mt-3 leading-8 text-muted-foreground">{copy}</p>{title === "Analytics and advertising measurement" && <Button className="mt-5" variant="outline" onClick={openConsentSettings}>Cookie settings</Button>}</section>)}<section><h2 className="font-playfair text-2xl text-primary">8. Contact</h2><p className="mt-3 leading-8 text-muted-foreground">Questions or privacy requests can be sent to <a className="font-medium text-primary underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p></section></div></div></main><Footer /></div>;
 export default PrivacyPolicy;

@@ -1,10 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 const allowedLevels = ["PhD", "Master's", "Academic/Researcher", "Professional", "Organisation", "Other"];
 const allowedContacts = ["Email", "WhatsApp", "Either"];
@@ -54,8 +51,16 @@ function priorityFor(budget: string, description: string) {
 }
 
 function decodeBase64(value: string) {
+  if (!/^[A-Za-z0-9+/]*={0,2}$/.test(value) || value.length % 4 !== 0) throw new Error("Invalid file encoding");
   const raw = atob(value);
   return Uint8Array.from(raw, (character) => character.charCodeAt(0));
+}
+
+function signatureMatches(bytes: Uint8Array, mimeType: string) {
+  if (mimeType === "application/pdf") return String.fromCharCode(...bytes.slice(0, 5)) === "%PDF-";
+  if (mimeType.includes("openxmlformats")) return bytes[0] === 0x50 && bytes[1] === 0x4b;
+  if (mimeType === "application/msword" || mimeType === "application/vnd.ms-excel") return bytes[0] === 0xd0 && bytes[1] === 0xcf;
+  return mimeType === "text/csv" || mimeType === "text/plain";
 }
 
 serve(async (request) => {
@@ -116,6 +121,7 @@ serve(async (request) => {
     if ((preferredContact === "WhatsApp" || preferredContact === "Either") && !whatsapp) return json({ error: "Please provide a WhatsApp number for your preferred contact method." }, 400);
 
     const file = body.file && typeof body.file === "object" ? body.file : null;
+    let fileBytes: Uint8Array | null = null;
     if (file) {
       const fileName = text(file.name, 180);
       const mimeType = text(file.type, 120);
@@ -123,6 +129,12 @@ serve(async (request) => {
       if (!fileName || !allowedMimeTypes.includes(mimeType) || !Number.isFinite(size) || size < 1 || size > 10 * 1024 * 1024 || typeof file.base64 !== "string") {
         return json({ error: "Upload a PDF, Word, Excel, CSV, or text file up to 10 MB." }, 400);
       }
+      try {
+        fileBytes = decodeBase64(file.base64.replace(/\s/g, ""));
+      } catch {
+        return json({ error: "The uploaded file could not be read." }, 400);
+      }
+      if (fileBytes.length !== size || !signatureMatches(fileBytes, mimeType)) return json({ error: "The uploaded file does not match its declared format." }, 400);
     }
 
     const priority = priorityFor(budgetRange, description);
@@ -157,24 +169,30 @@ serve(async (request) => {
     if (leadError || !lead) return json({ error: "We could not save your enquiry. Please try again." }, 500);
 
     let documentUploaded = false;
-    if (file) {
+    if (file && fileBytes) {
       const safeName = text(file.name, 180).replace(/[^a-zA-Z0-9._-]/g, "-");
       const storagePath = `${lead.id}/${crypto.randomUUID()}-${safeName}`;
-      const bytes = decodeBase64(file.base64);
-      const { error: uploadError } = await supabase.storage.from("research-enquiries").upload(storagePath, bytes, {
+      const { error: uploadError } = await supabase.storage.from("research-enquiries").upload(storagePath, fileBytes, {
         contentType: file.type,
         upsert: false,
       });
-      if (!uploadError) {
-        const { error: documentError } = await supabase.from("enquiry_documents").insert({
+      if (uploadError) {
+        await supabase.from("project_leads").delete().eq("id", lead.id);
+        return json({ error: "The document could not be stored. Please try again." }, 500);
+      }
+      const { error: documentError } = await supabase.from("enquiry_documents").insert({
           lead_id: lead.id,
           storage_path: storagePath,
           original_name: file.name,
           mime_type: file.type,
           size_bytes: file.size,
-        });
-        documentUploaded = !documentError;
+      });
+      if (documentError) {
+        await supabase.storage.from("research-enquiries").remove([storagePath]);
+        await supabase.from("project_leads").delete().eq("id", lead.id);
+        return json({ error: "The enquiry could not be completed. Please try again." }, 500);
       }
+      documentUploaded = true;
     }
 
     return json({ success: true, enquiry_id: lead.id, priority, document_uploaded: documentUploaded });
