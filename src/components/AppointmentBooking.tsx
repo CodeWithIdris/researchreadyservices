@@ -107,6 +107,7 @@ const AppointmentBooking = () => {
       setErrors(fieldErrors);
       return;
     }
+    if (!selectedDate) return;
 
     setIsLoading(true);
 
@@ -119,7 +120,7 @@ const AppointmentBooking = () => {
           client_email: formData.email,
           client_phone: formData.phone || null,
           client_timezone: visitorTimezone,
-          appointment_date: selectedDate!.toISOString().split('T')[0],
+          appointment_date: selectedDate.toISOString().split('T')[0],
           appointment_time: formData.time,
           appointment_type: formData.type,
           meeting_link: null,

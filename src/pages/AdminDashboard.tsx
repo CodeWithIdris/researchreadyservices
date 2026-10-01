@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Loader2, LogOut, MessageSquare, Ticket, Mail, Users, 
-  Calendar, Clock, RefreshCw, Eye, Bell, Target, Zap, Filter
+  Calendar, Clock, RefreshCw, Eye, Bell, Target, Zap, Filter, FileText, ExternalLink
 } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
 
@@ -66,7 +66,20 @@ interface ProjectLead {
   source: string;
   fast_response: boolean;
   created_at: string;
+  whatsapp: string | null;
+  research_level: string | null;
+  discipline: string | null;
+  support_type: string | null;
+  research_stage: string | null;
+  preferred_contact: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  landing_page: string | null;
+  ad_angle: string | null;
 }
+
+interface EnquiryDocument { id: string; lead_id: string; original_name: string; mime_type: string; size_bytes: number; }
 
 const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -75,6 +88,7 @@ const AdminDashboard = () => {
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [leads, setLeads] = useState<ProjectLead[]>([]);
+  const [leadDocuments, setLeadDocuments] = useState<Record<string, EnquiryDocument[]>>({});
   const [leadFilter, setLeadFilter] = useState<string>("all");
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const [sessionMessages, setSessionMessages] = useState<Message[]>([]);
@@ -247,6 +261,16 @@ const AdminDashboard = () => {
       if (!leadsError && leadsData) {
         setLeads(leadsData as ProjectLead[]);
       }
+      const { data: documentsData } = await supabase
+        .from('enquiry_documents')
+        .select('id, lead_id, original_name, mime_type, size_bytes')
+        .order('created_at', { ascending: false });
+      if (documentsData) {
+        setLeadDocuments(documentsData.reduce<Record<string, EnquiryDocument[]>>((grouped, document) => {
+          (grouped[document.lead_id] ||= []).push(document);
+          return grouped;
+        }, {}));
+      }
     } catch (error) {
       console.error("Error loading data:", error);
       toast({
@@ -328,6 +352,17 @@ const AdminDashboard = () => {
     } catch {
       toast({ title: "Error", description: "Failed to update lead.", variant: "destructive" });
     }
+  };
+
+  const openEnquiryDocument = async (document: EnquiryDocument) => {
+    const { data, error } = await supabase.functions.invoke('research-enquiry', {
+      body: { action: 'signed_document_url', document_id: document.id },
+    });
+    if (error || !data?.url) {
+      toast({ title: "Unable to open document", description: "Please try again.", variant: "destructive" });
+      return;
+    }
+    window.open(data.url, '_blank', 'noopener,noreferrer');
   };
 
   const formatDate = (dateString: string) => {
@@ -528,7 +563,7 @@ const AdminDashboard = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle>Project Leads</CardTitle>
-                      <CardDescription>Applications from /work-with-us landing page</CardDescription>
+                      <CardDescription>Research enquiries from the consultation form</CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
                       <Filter className="w-4 h-4 text-muted-foreground" />
@@ -595,9 +630,12 @@ const AdminDashboard = () => {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="new">New</SelectItem>
+                                     <SelectItem value="reviewing">Reviewing</SelectItem>
                                     <SelectItem value="contacted">Contacted</SelectItem>
+                                     <SelectItem value="qualified">Qualified</SelectItem>
                                     <SelectItem value="converted">Converted</SelectItem>
-                                    <SelectItem value="rejected">Rejected</SelectItem>
+                                     <SelectItem value="not_a_fit">Not a fit</SelectItem>
+                                     <SelectItem value="closed">Closed</SelectItem>
                                   </SelectContent>
                                 </Select>
                                 <Button
@@ -882,6 +920,15 @@ const AdminDashboard = () => {
                   <p className="text-sm text-muted-foreground mb-1">Project Description</p>
                   <p className="text-sm bg-muted/50 rounded-lg p-4">{selectedLead.description}</p>
                 </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><p className="text-sm text-muted-foreground">Research level</p><p className="font-medium">{selectedLead.research_level || "Not provided"}</p></div>
+                    <div><p className="text-sm text-muted-foreground">Discipline</p><p className="font-medium">{selectedLead.discipline || "Not provided"}</p></div>
+                    <div><p className="text-sm text-muted-foreground">Research stage</p><p className="font-medium">{selectedLead.research_stage || "Not provided"}</p></div>
+                    <div><p className="text-sm text-muted-foreground">Preferred contact</p><p className="font-medium">{selectedLead.preferred_contact || "Not provided"}</p></div>
+                    {selectedLead.whatsapp && <div><p className="text-sm text-muted-foreground">WhatsApp</p><p className="font-medium">{selectedLead.whatsapp}</p></div>}
+                    <div><p className="text-sm text-muted-foreground">Campaign</p><p className="font-medium">{selectedLead.utm_campaign || selectedLead.ad_angle || "Organic / untagged"}</p></div>
+                  </div>
+                  {(leadDocuments[selectedLead.id]?.length || 0) > 0 && <div><p className="mb-2 text-sm text-muted-foreground">Documents</p><div className="space-y-2">{leadDocuments[selectedLead.id].map((document) => <Button key={document.id} variant="outline" className="w-full justify-between" onClick={() => openEnquiryDocument(document)}><span className="flex min-w-0 items-center gap-2"><FileText className="h-4 w-4 shrink-0" /><span className="truncate">{document.original_name}</span></span><ExternalLink className="h-4 w-4 shrink-0" /></Button>)}</div></div>}
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">Status:</span>
                   <Select
@@ -896,9 +943,12 @@ const AdminDashboard = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="new">New</SelectItem>
+                       <SelectItem value="reviewing">Reviewing</SelectItem>
                       <SelectItem value="contacted">Contacted</SelectItem>
+                       <SelectItem value="qualified">Qualified</SelectItem>
                       <SelectItem value="converted">Converted</SelectItem>
-                      <SelectItem value="rejected">Rejected</SelectItem>
+                       <SelectItem value="not_a_fit">Not a fit</SelectItem>
+                       <SelectItem value="closed">Closed</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
