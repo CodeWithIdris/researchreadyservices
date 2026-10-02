@@ -78,11 +78,11 @@ interface ProjectLead {
   utm_campaign: string | null;
   landing_page: string | null;
   ad_angle: string | null;
-  first_utm_source: string | null;
-  first_utm_medium: string | null;
-  first_utm_campaign: string | null;
-  first_referrer: string | null;
-  first_landing_page: string | null;
+  first_utm_source?: string | null;
+  first_utm_medium?: string | null;
+  first_utm_campaign?: string | null;
+  first_referrer?: string | null;
+  first_landing_page?: string | null;
 }
 
 interface EnquiryDocument { id: string; lead_id: string; original_name: string; mime_type: string; size_bytes: number; }
