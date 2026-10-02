@@ -43,6 +43,76 @@ const Index = () => (
         </div>
       </section>
 
+      <section className="border-y border-border bg-[#f5f4f2] py-10 lg:py-14">
+        <div className="container space-y-8">
+          <div className="rounded-[22px] border-[1.5px] border-[#1b1b1c] bg-[#f6f4f0] p-4 shadow-[0_0_0_1px_rgba(27,27,28,0.06)] sm:p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-lg font-medium leading-tight text-[#1f2023] sm:text-[2rem]">Which premium palette should guide the redesign?</h3>
+              <span className="text-xl font-light text-[#1f2023]">×</span>
+            </div>
+            <div className="mt-5 overflow-hidden rounded-[18px] border-[1.5px] border-[#1b1b1c] bg-[#dfd9cc]">
+              <div className="grid h-20 grid-cols-3 sm:h-24">
+                <div className="bg-[#1b2430]" />
+                <div className="bg-[#273e57]" />
+                <div className="bg-[#d3ae5c]" />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[22px] border-[1.5px] border-[#1b1b1c] bg-[#f6f4f0] p-4 shadow-[0_0_0_1px_rgba(27,27,28,0.06)] sm:p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-lg font-medium leading-tight text-[#1f2023] sm:text-[2rem]">Which typography pairing feels right for ResearchReady?</h3>
+              <span className="text-xl font-light text-[#1f2023]">×</span>
+            </div>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[18px] border-[1.5px] border-[#1b1b1c] bg-[#f8f5f1] p-4">
+                <p className="font-playfair text-[2rem] leading-none tracking-[-0.04em] text-[#1f2023]">Title - Lib...</p>
+                <p className="mt-3 text-sm text-[#4a4d53]">Body - IBM Plex...</p>
+                <div className="mt-6 space-y-2">
+                  <p className="text-base font-medium uppercase tracking-[0.12em] text-[#1f2023]">Scholarly Authority</p>
+                  <p className="text-sm leading-6 text-[#4a4d53]">Editorial and highly credible, with excellent long-form readability.</p>
+                </div>
+              </div>
+
+              <div className="rounded-[18px] border-[1.5px] border-[#1b1b1c] bg-[#f8f5f1] p-4">
+                <p className="font-playfair text-[2rem] leading-none tracking-[-0.04em] text-[#1f2023]">Title - Spa...</p>
+                <p className="mt-3 text-sm text-[#4a4d53]">Body - DM Sans</p>
+                <div className="mt-6 space-y-2">
+                  <p className="text-base font-medium uppercase tracking-[0.12em] text-[#1f2023]">Modern Precision</p>
+                  <p className="text-sm leading-6 text-[#4a4d53]">Contemporary, clean, and closest to Three UI's technical confidence.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[22px] border-[1.5px] border-[#1b1b1c] bg-[#f6f4f0] p-4 shadow-[0_0_0_1px_rgba(27,27,28,0.06)] sm:p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-lg font-medium leading-tight text-[#1f2023] sm:text-[2rem]">Which overall page style should I use?</h3>
+              <span className="text-xl font-light text-[#1f2023]">×</span>
+            </div>
+            <div className="mt-5 grid gap-5 md:grid-cols-[1.15fr_0.85fr]">
+              <div className="rounded-[18px] border-[1.5px] border-[#1b1b1c] bg-[#dfe2e4] p-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="h-28 rounded-[12px] border-[1.5px] border-[#1b1b1c] bg-[#e8e3de]" />
+                  <div className="h-28 rounded-[12px] border-[1.5px] border-[#1b1b1c] bg-[#e8e3de]" />
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <div className="h-20 rounded-[12px] border-[1.5px] border-[#1b1b1c] bg-[#e8e3de]" />
+                  <div className="h-20 rounded-[12px] border-[1.5px] border-[#1b1b1c] bg-[#e8e3de]" />
+                </div>
+              </div>
+
+              <div className="flex items-center">
+                <div className="space-y-2 text-[#1f2023]">
+                  <p className="text-[1.1rem] font-medium text-[#1f2023]">Editorial Grid</p>
+                  <p className="max-w-sm text-sm leading-6 text-[#4a4d53]">Strong featured content with a structured research-publication rhythm.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 lg:py-24">
         <div className="container"><div className="mb-10 max-w-2xl"><p className="eyebrow">Choose your pathway</p><h2 className="section-title">Research support for different stages of serious work</h2></div>
           <div className="grid border-l border-t border-border md:grid-cols-2 lg:grid-cols-4">{audiences.map((audience) => <article key={audience.title} className="border-b border-r border-border p-6 lg:p-7"><audience.icon className="h-6 w-6 text-accent" /><h3 className="mt-8 font-playfair text-xl text-primary">{audience.title}</h3><p className="mt-3 min-h-24 text-sm leading-6 text-muted-foreground">{audience.copy}</p><Link className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-primary" to={`/services/${audience.slug}`}>Explore support <ArrowRight className="h-4 w-4" /></Link></article>)}</div>
