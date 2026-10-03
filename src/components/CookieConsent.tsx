@@ -26,11 +26,11 @@ const CookieConsent = () => {
   if (!isVisible) return <Button variant="outline" size="icon" className="fixed bottom-4 left-4 z-40" aria-label="Cookie settings" title="Cookie settings" onClick={() => setIsVisible(true)}><Cookie className="h-4 w-4" /></Button>;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-fade-in" role="dialog" aria-label="Cookie choices">
-      <div className="container mx-auto max-w-4xl">
-        <div className="bg-background border border-border rounded-md shadow-xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <div className="fixed inset-x-0 bottom-0 z-50 p-3 animate-fade-in sm:p-5" role="dialog" aria-label="Cookie choices">
+      <div className="mx-auto max-w-4xl">
+        <div className="flex flex-col items-start gap-4 border border-border bg-card p-4 shadow-xl sm:flex-row sm:items-center sm:p-5">
           <div className="flex-shrink-0">
-            <div className="w-11 h-11 bg-accent/10 rounded-md flex items-center justify-center">
+            <div className="flex h-10 w-10 items-center justify-center border border-accent/40 bg-accent/10">
               <Cookie className="w-6 h-6 text-accent" />
             </div>
           </div>

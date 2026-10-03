@@ -8,42 +8,42 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 40 33% 98%;
-    --foreground: 220 30% 15%;
+    --background: 45 22% 96%;
+    --foreground: 36 10% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 30% 15%;
+    --card: 40 20% 99%;
+    --card-foreground: 36 10% 10%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 220 30% 15%;
 
-    --primary: 220 50% 20%;
-    --primary-foreground: 40 33% 98%;
+    --primary: 36 10% 10%;
+    --primary-foreground: 45 22% 96%;
 
-    --secondary: 40 40% 94%;
-    --secondary-foreground: 220 30% 15%;
+    --secondary: 42 16% 91%;
+    --secondary-foreground: 36 10% 10%;
 
-    --muted: 220 20% 94%;
-    --muted-foreground: 220 15% 45%;
+    --muted: 40 12% 91%;
+    --muted-foreground: 32 7% 39%;
 
-    --accent: 38 85% 55%;
-    --accent-foreground: 220 50% 12%;
+    --accent: 40 55% 50%;
+    --accent-foreground: 36 10% 10%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 220 20% 88%;
-    --input: 220 20% 88%;
-    --ring: 38 85% 55%;
+    --border: 38 12% 82%;
+    --input: 38 12% 82%;
+    --ring: 40 55% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.125rem;
 
     /* Custom tokens */
-    --gold: 38 85% 55%;
-    --gold-light: 40 80% 70%;
-    --navy: 220 50% 20%;
-    --navy-light: 220 40% 35%;
-    --cream: 40 33% 98%;
+    --gold: 40 55% 50%;
+    --gold-light: 41 48% 65%;
+    --navy: 36 10% 10%;
+    --navy-light: 32 8% 24%;
+    --cream: 45 22% 96%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -107,13 +107,24 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-sans antialiased;
+    letter-spacing: 0;
   }
+
+  ::selection { @apply bg-accent text-accent-foreground; }
+
+  a, button, input, textarea, select { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background; }
 }
 
 @layer components {
-  .eyebrow { @apply mb-4 text-xs font-semibold uppercase text-accent; letter-spacing: .18em; }
-  .section-title { @apply font-playfair text-3xl leading-tight text-primary sm:text-4xl; }
+  .eyebrow { @apply mb-4 text-[0.6875rem] font-semibold uppercase text-accent; letter-spacing: .16em; }
+  .section-title { @apply max-w-3xl font-playfair text-3xl leading-[1.18] text-primary sm:text-4xl lg:text-5xl; }
+  .editorial-section { @apply border-t border-border py-16 lg:py-24; }
+  .editorial-rule { @apply border-t border-border pt-6; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
 @layer utilities {

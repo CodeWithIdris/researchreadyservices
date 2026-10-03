@@ -1,7 +1,7 @@
 import { BarChart3, BookOpen, Braces, FileText } from "lucide-react";
 
 const ResearchWorkspace = () => (
-  <div className="relative min-h-[380px] border border-primary/20 bg-card p-5 shadow-sm lg:min-h-[470px]" aria-label="Research workspace showing papers, notes and analysis">
+  <div className="group relative min-h-[380px] border border-border bg-card p-5 shadow-[0_30px_70px_-45px_hsl(var(--foreground)/.45)] transition-transform duration-500 lg:min-h-[470px] lg:hover:-translate-y-1" aria-label="Research workspace showing papers, notes and analysis">
     <div className="flex items-center justify-between border-b border-border pb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
       <span>Research workspace</span><span>Evidence → argument</span>
     </div>
@@ -15,7 +15,7 @@ const ResearchWorkspace = () => (
             ))}
           </div>
         </div>
-        <div className="border border-border bg-primary p-4 text-primary-foreground">
+        <div className="border border-primary bg-primary p-4 text-primary-foreground">
           <div className="flex items-center gap-2 text-sm font-semibold"><Braces className="h-4 w-4 text-accent" /> Method decision</div>
           <p className="mt-3 font-playfair text-xl leading-snug">Does the analysis answer the question the study is actually asking?</p>
         </div>
@@ -35,7 +35,7 @@ const ResearchWorkspace = () => (
         </div>
       </div>
     </div>
-    <div className="absolute -bottom-4 -left-4 border border-accent bg-background px-4 py-3 text-xs font-semibold uppercase tracking-widest text-primary shadow-lg">Structured expertise</div>
+    <div className="absolute -bottom-4 -left-3 border border-accent bg-background px-4 py-3 text-[0.65rem] font-semibold uppercase tracking-widest text-primary shadow-lg">Structured expertise</div>
   </div>
 );
 
