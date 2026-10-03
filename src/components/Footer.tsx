@@ -34,15 +34,13 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-primary text-primary-foreground">
+    <footer className="border-t border-primary-foreground/15 bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 lg:px-8 py-12 lg:py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5 lg:gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="inline-block mb-4" aria-label="Research Ready Services Homepage">
-              <span className="font-playfair text-2xl font-bold">
-                Research<span className="text-accent">Ready</span>
-              </span>
+              <span className="font-playfair text-2xl font-bold">ResearchReady</span>
             </Link>
             <p className="text-primary-foreground/70 mb-6 max-w-sm">
               Research support built around the problem you're actually trying to solve.
@@ -55,7 +53,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors"
+                  className="flex h-10 w-10 items-center justify-center border border-primary-foreground/20 transition-colors hover:border-accent hover:bg-accent hover:text-accent-foreground"
                 >
                   <social.icon className="w-5 h-5" />
                 </a>

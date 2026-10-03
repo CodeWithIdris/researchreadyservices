@@ -10,3 +10,10 @@
 - [x] Correct metadata, structured data, sitemap, canonicals, privacy disclosure, and internal links.
 - [x] Remove unverified testimonials, statistics, guarantees, and student-assignment positioning.
 - [ ] Verify public pages on desktop and mobile while preserving client/admin authentication and dashboards.
+
+## Editorial interface redesign
+
+- [ ] Apply the sophisticated global editorial design system to shared public-page elements.
+- [ ] Recompose the homepage around a stronger editorial hierarchy and layered research workspace.
+- [ ] Align Services, Insights, About, FAQs, Support, booking, and consultation pages with the shared system.
+- [ ] Verify public pages at mobile, tablet, and desktop sizes.

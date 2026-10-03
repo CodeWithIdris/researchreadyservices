@@ -69,7 +69,7 @@ export default {
       },
       fontFamily: {
         playfair: ["Libre Baskerville", "serif"],
-        sans: ["DM Sans", "system-ui", "sans-serif"],
+        sans: ["IBM Plex Sans", "DM Sans", "system-ui", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

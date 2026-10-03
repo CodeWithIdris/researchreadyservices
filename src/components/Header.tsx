@@ -17,24 +17,23 @@ const Header = () => {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/95 backdrop-blur-md">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex h-16 items-center justify-between lg:h-[4.5rem]">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <span className="font-playfair text-xl lg:text-2xl font-bold text-primary">
-              Research<span className="text-accent">Ready</span>
-            </span>
+          <Link to="/" className="flex items-center gap-3">
+            <span className="grid h-7 w-7 place-items-center bg-primary"><span className="h-2 w-2 bg-primary-foreground" /></span>
+            <span className="font-playfair text-lg font-bold text-primary lg:text-xl">ResearchReady</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
+          <nav className="hidden items-center gap-8 lg:flex">
             {navLinks.map((link) => (
               link.href.startsWith("/") && !link.href.includes("#") ? (
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium flex items-center gap-1"
+                  className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground transition-colors duration-200 hover:text-primary"
                 >
                   {link.name}
                 </Link>
@@ -82,7 +81,7 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2"
+            className="p-2 lg:hidden"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
