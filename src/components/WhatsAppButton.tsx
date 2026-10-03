@@ -12,12 +12,12 @@ const WhatsAppButton = () => {
       onClick={() => {
         trackWhatsAppClick("floating_button");
       }}
-      className="fixed bottom-24 right-6 z-40 group"
+      className="group fixed bottom-20 right-4 z-40 sm:bottom-6 sm:right-6"
       aria-label="Chat on WhatsApp"
     >
       <Button
         size="lg"
-        className="h-14 w-14 rounded-full bg-accent text-accent-foreground shadow-lg transition-transform duration-300 group-hover:scale-105 hover:bg-accent/90"
+        className="h-12 w-12 rounded-sm border border-accent bg-accent text-accent-foreground shadow-lg transition-transform duration-300 group-hover:-translate-y-1 hover:bg-primary hover:text-primary-foreground"
       >
         <MessageCircle className="h-7 w-7" />
       </Button>
