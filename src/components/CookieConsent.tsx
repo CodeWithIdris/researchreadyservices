@@ -29,7 +29,7 @@ const CookieConsent = () => {
     <div className="fixed inset-x-0 bottom-0 z-50 p-3 animate-fade-in sm:p-5" role="dialog" aria-label="Cookie choices">
       <div className="mx-auto max-w-4xl">
         <div className="flex flex-col items-start gap-4 border border-border bg-card p-4 shadow-xl sm:flex-row sm:items-center sm:p-5">
-          <div className="flex-shrink-0">
+          <div className="hidden flex-shrink-0 sm:block">
             <div className="flex h-10 w-10 items-center justify-center border border-accent/40 bg-accent/10">
               <Cookie className="w-6 h-6 text-accent" />
             </div>
@@ -37,12 +37,10 @@ const CookieConsent = () => {
           <div className="flex-1">
             <h3 className="font-semibold text-foreground mb-1">We value your privacy</h3>
             <p className="text-sm text-muted-foreground">
-              Google Analytics and Meta help us measure visits and advertising. You can accept or reject them, then change this choice later. 
-              Read our{" "}
+              Allow analytics and advertising cookies? Your choice can be changed later. Read our{" "}
               <a href="/privacy" className="text-primary hover:underline">
                 Privacy Policy
-              </a>{" "}
-              for more information.
+              </a>.
             </p>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
