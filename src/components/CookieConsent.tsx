@@ -40,8 +40,7 @@ const CookieConsent = () => {
               Allow analytics and advertising cookies? Your choice can be changed later. Read our{" "}
               <a href="/privacy" className="text-primary hover:underline">
                 Privacy Policy
-              </a>{" "}
-              .
+              </a>.
             </p>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
