@@ -27,21 +27,23 @@ const Index = () => (
     <SEOHead schema={{ "@context": "https://schema.org", "@type": "Service", name: "Professional research support and consulting", provider: { "@type": "Organization", name: "ResearchReady Services" } }} />
     <Header />
     <main>
-      <section className="border-b border-border pt-20 lg:pt-24">
-        <div className="container grid min-h-[calc(100vh-6rem)] items-center gap-10 py-10 lg:grid-cols-[1.08fr_.92fr] lg:py-16">
-          <div>
+      <section className="border-b border-border pt-16 lg:pt-[4.5rem]">
+        <div className="container grid items-center gap-10 py-10 lg:grid-cols-2 lg:gap-0 lg:py-0">
+          <div className="lg:py-14 lg:pr-12">
             <p className="mb-5 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-accent">International research consultancy</p>
             <h1 className="max-w-3xl font-playfair text-4xl leading-[1.08] text-primary sm:text-5xl lg:text-6xl">Complex research needs a clearer way forward.</h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">ResearchReady helps researchers and organisations move from scattered evidence and difficult methodological choices to structured, defensible work.</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button variant="gold" size="xl" asChild><Link to={consultationUrl()} onClick={() => trackCTAClick("discuss_research", "Discuss Your Research", "homepage_hero")}>Discuss Your Research <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
-              <Button variant="outline" size="xl" asChild><Link to={consultationUrl()} onClick={() => trackCTAClick("research_assessment", "Request a Research Assessment", "homepage_hero")}>Request a Research Assessment</Link></Button>
+            <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              <Button variant="hero" size="lg" className="w-full sm:w-auto" asChild><Link to={consultationUrl()} onClick={() => trackCTAClick("discuss_research", "Discuss Your Research", "homepage_hero")}>Discuss Your Research <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+              <Button variant="link" size="lg" className="h-10 px-0" asChild><Link to="/services">Explore services <ArrowRight className="h-4 w-4" /></Link></Button>
             </div>
             <p className="mt-5 max-w-xl border-t border-border pt-4 text-xs uppercase tracking-wider text-muted-foreground">PhD · Master's · Academic publishing · Professional research</p>
           </div>
           <ResearchWorkspace />
         </div>
       </section>
+
+      <section className="bg-primary text-primary-foreground"><div className="container grid gap-0 sm:grid-cols-3">{[{ label: "Evidence", copy: "Literature & synthesis" }, { label: "Method", copy: "Design & analysis" }, { label: "Contribution", copy: "Interpretation & publishing" }].map((item) => <div key={item.label} className="border-b border-primary-foreground/15 py-6 sm:border-b-0 sm:border-r sm:px-6 sm:py-8 first:sm:pl-0 last:sm:border-r-0"><p className="font-playfair text-xl">{item.label}</p><p className="mt-2 text-[0.65rem] uppercase tracking-wider text-primary-foreground/65">{item.copy}</p></div>)}</div></section>
 
       <section className="editorial-section border-t-0">
         <div className="container"><div className="mb-10 max-w-2xl"><p className="eyebrow">Choose your pathway</p><h2 className="section-title">Research support for different stages of serious work</h2></div>

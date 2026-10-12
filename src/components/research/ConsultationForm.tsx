@@ -63,7 +63,7 @@ const ConsultationForm = ({ source = "consultation_page" }: { source?: string })
   if (status === "success") return <div className="border border-accent bg-secondary p-8 text-center"><CheckCircle2 className="mx-auto h-10 w-10 text-primary" /><h3 className="mt-4 font-playfair text-2xl text-primary">We've received your research enquiry.</h3><p className="mt-3 text-muted-foreground">We'll review the information and contact you about the next step.</p></div>;
 
   return (
-    <form onSubmit={submit} className="grid gap-5" id="research-enquiry-form">
+    <form onSubmit={submit} className="grid min-w-0 gap-6 border-t border-border pt-7" id="research-enquiry-form">
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="Name" htmlFor="enquiry-name"><Input id="enquiry-name" required maxLength={100} value={form.name} onChange={(event) => set("name", event.target.value)} /></Field>
         <Field label="Email" htmlFor="enquiry-email"><Input id="enquiry-email" type="email" required maxLength={255} value={form.email} onChange={(event) => set("email", event.target.value)} /></Field>
@@ -83,12 +83,12 @@ const ConsultationForm = ({ source = "consultation_page" }: { source?: string })
       </div>
       {error && <p role="alert" className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>}
       <Button type="submit" variant="gold" size="xl" disabled={status === "submitting"}>{status === "submitting" ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Submitting enquiry</> : "Submit Research Enquiry"}</Button>
-      <p className="text-xs leading-5 text-muted-foreground">Your information and document are used to assess this enquiry. Research support is collaborative and must be used in line with your institution's academic integrity requirements.</p>
+      <p className="border-t border-border pt-4 text-xs leading-5 text-muted-foreground">Documents remain private and are reviewed by authorised staff. Research support is collaborative and must be used in line with your institution's academic integrity requirements.</p>
     </form>
   );
 };
 
-const Field = ({ label, htmlFor, children }: { label: string; htmlFor: string; children: React.ReactNode }) => <div><Label htmlFor={htmlFor} className="mb-2 block">{label}</Label>{children}</div>;
-const SelectField = ({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (value: string) => void }) => <div><Label className="mb-2 block">{label}</Label><Select value={value} onValueChange={onChange} required><SelectTrigger><SelectValue placeholder={`Select ${label.toLowerCase()}`} /></SelectTrigger><SelectContent>{options.map((option) => <SelectItem value={option} key={option}>{option}</SelectItem>)}</SelectContent></Select></div>;
+const Field = ({ label, htmlFor, children }: { label: string; htmlFor: string; children: React.ReactNode }) => <div className="min-w-0"><Label htmlFor={htmlFor} className="mb-2 block text-xs">{label}</Label>{children}</div>;
+const SelectField = ({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (value: string) => void }) => <div className="min-w-0"><Label className="mb-2 block text-xs">{label}</Label><Select value={value} onValueChange={onChange} required><SelectTrigger aria-label={label} className="h-auto min-h-10 text-left [&>span]:whitespace-normal"><SelectValue placeholder={`Select ${label.toLowerCase()}`} /></SelectTrigger><SelectContent>{options.map((option) => <SelectItem value={option} key={option}>{option}</SelectItem>)}</SelectContent></Select></div>;
 
 export default ConsultationForm;
